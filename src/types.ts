@@ -43,12 +43,23 @@ export interface WorldEvent {
   year: number;
   title: string;
   summary: string;
+  cause?: string;
+  effect?: string;
+  globalImpact?: string;
+  territoryChange?: string;
+  regimeChange?: string;
+  links?: GlobalLink[];
   category: EventCategory;
   regions: Region[];
   polityIds: string[];
   chapterId: string;
   importance: 1 | 2 | 3;
   featured?: boolean;
+}
+
+export interface GlobalLink {
+  from: string;
+  to: string;
 }
 
 export interface PolityRule {

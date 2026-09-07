@@ -28,6 +28,36 @@ export default function InfoDrawer({ open, polity, event, onClose }: InfoDrawerP
       {polity?.nameEn && <p className="drawer-sub">{polity.nameEn} · {polity.type}</p>}
       {event && <p className="drawer-sub">{event.year} · {event.regions.join(' / ')}</p>}
       <p className="drawer-summary">{summary}</p>
+      {event?.cause && (
+        <section className="drawer-section">
+          <h3>前因</h3>
+          <p>{event.cause}</p>
+        </section>
+      )}
+      {event?.effect && (
+        <section className="drawer-section">
+          <h3>后果与影响</h3>
+          <p>{event.effect}</p>
+        </section>
+      )}
+      {event?.globalImpact && (
+        <section className="drawer-section">
+          <h3>全球格局</h3>
+          <p>{event.globalImpact}</p>
+        </section>
+      )}
+      {event?.territoryChange && (
+        <section className="drawer-section">
+          <h3>领土变化</h3>
+          <p>{event.territoryChange}</p>
+        </section>
+      )}
+      {event?.regimeChange && (
+        <section className="drawer-section">
+          <h3>政权变化</h3>
+          <p>{event.regimeChange}</p>
+        </section>
+      )}
     </aside>
   );
 }

@@ -6,6 +6,7 @@ import { events } from '../src/data/events';
 import { polities } from '../src/data/polities';
 import { polityRules } from '../src/data/polityRules';
 import { ownerForYear } from '../src/lib/attribution';
+import { eventDetails } from '../src/data/eventDetails';
 
 describe('world data validation', () => {
   it('reports no structural errors', () => {
@@ -23,6 +24,14 @@ describe('world data validation', () => {
     const ids = new Set(polities.map((p) => p.id));
     const bad = polityRules.filter((r) => !ids.has(r.polityId));
     expect(bad.map((r) => r.polityId)).toEqual([]);
+  });
+
+  it('every event has cause and effect details', () => {
+    const missing = events.filter((event) => {
+      const detail = eventDetails[event.id];
+      return !detail || !detail.cause || !detail.effect;
+    });
+    expect(missing.map((event) => event.id)).toEqual([]);
   });
 
   it('attributes China to the right polity in key years', () => {

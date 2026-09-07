@@ -16,6 +16,7 @@ describe('App', () => {
       <WorldMap
         frame={{ year: 1300, ownership: {} }}
         highlightIds={[]}
+        links={[]}
         onSelectPolity={() => undefined}
       />,
     );

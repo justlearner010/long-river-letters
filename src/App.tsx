@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import { chapters } from './data/chapters';
 import { slices } from './data/slices';
-import { events } from './data/events';
 import { polities } from './data/polities';
 import { polityRules } from './data/polityRules';
+import { enrichedEvents as events, getEnrichedEvent } from './lib/enrichEvents';
 import { loadCountries } from './lib/world';
 import { buildAttributionFrame } from './lib/attribution';
 import { filterEvents } from './lib/filter';
 import { saveState, loadState } from './lib/storage';
 import { appReducer, chapterSlices, initialAppState } from './state/appReducer';
+import type { GlobalLink, WorldEvent } from './types';
 import TopBar from './components/TopBar';
 import ChapterRail from './components/ChapterRail';
 import TimeScrubber from './components/TimeScrubber';
@@ -42,6 +43,10 @@ export default function App() {
       ).slice(0, 6),
     [slice, chapter],
   );
+  const sliceFeaturedEvents = useMemo(
+    () => slice.featuredEventIds.map(getEnrichedEvent).filter(Boolean) as WorldEvent[],
+    [slice],
+  );
   const selectedEvent = events.find((e) => e.id === state.selectedEventId) ?? null;
   const selectedPolity = polities.find((p) => p.id === state.selectedPolityId) ?? null;
 
@@ -63,12 +68,30 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, [state.playing, chapterSlicesList, slice.id]);
 
+  const playbackHighlightIds = useMemo(
+    () => Array.from(new Set(sliceFeaturedEvents.flatMap((event) => event.polityIds))),
+    [sliceFeaturedEvents],
+  );
+  const playbackLinks = useMemo(
+    () => sliceFeaturedEvents.flatMap((event) => event.links ?? []) as GlobalLink[],
+    [sliceFeaturedEvents],
+  );
   const highlightIds =
     state.selectedEventId
       ? (selectedEvent?.polityIds ?? [])
-      : state.selectedPolityId
-        ? [state.selectedPolityId]
-        : [];
+      : state.playing
+        ? playbackHighlightIds
+        : state.selectedPolityId
+          ? [state.selectedPolityId]
+          : [];
+  const links = state.selectedEventId
+    ? (selectedEvent?.links ?? [])
+    : state.playing
+      ? playbackLinks
+      : [];
+  const captionTitle = state.selectedEventId
+    ? (selectedEvent?.title ?? '')
+    : sliceFeaturedEvents.map((event) => event.title).join(' / ');
 
   return (
     <main className="app-shell">
@@ -87,8 +110,15 @@ export default function App() {
         <WorldMap
           frame={frame}
           highlightIds={highlightIds}
+          links={links}
           onSelectPolity={(polityId) => dispatch({ type: 'SELECT_POLITY', polityId })}
         />
+        {(state.playing || state.selectedEventId) && (
+          <div className="map-caption" aria-live="polite">
+            <span className="caption-year">{slice.year}</span>
+            <strong>{captionTitle}</strong>
+          </div>
+        )}
         <ChapterRail
           chapters={chapters}
           activeChapterId={chapter.id}
