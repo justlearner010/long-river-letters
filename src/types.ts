@@ -51,6 +51,7 @@ export interface WorldEvent {
   territoryChange?: string;
   regimeChange?: string;
   links?: GlobalLink[];
+  flows?: GlobalLink[];
   category: EventCategory;
   regions: Region[];
   polityIds: string[];

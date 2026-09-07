@@ -22,7 +22,7 @@ export default function EventCards({ events, onSelectEvent }: EventCardsProps) {
   }
   return (
     <div className="event-cards" aria-label="本时代事件">
-      {events.slice(0, 6).map((event) => (
+      {events.map((event) => (
         <button type="button" key={event.id} className="event-card" onClick={() => onSelectEvent(event.id)}>
           <span className="event-year">{event.year}</span>
           <span className="event-body">

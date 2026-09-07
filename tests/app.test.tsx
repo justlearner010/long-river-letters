@@ -17,6 +17,8 @@ describe('App', () => {
         frame={{ year: 1300, ownership: {} }}
         highlightIds={[]}
         links={[]}
+        flows={[]}
+        resetKey="c1"
         onSelectPolity={() => undefined}
       />,
     );

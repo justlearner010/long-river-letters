@@ -10,10 +10,12 @@ interface WorldMapProps {
   frame: AttributionFrame;
   highlightIds: string[];
   links: GlobalLink[];
+  flows: GlobalLink[];
+  resetKey: string;
   onSelectPolity: (polityId: string, countryName: string) => void;
 }
 
-export default function WorldMap({ frame, highlightIds, links, onSelectPolity }: WorldMapProps) {
+export default function WorldMap({ frame, highlightIds, links, flows, resetKey, onSelectPolity }: WorldMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 900, height: 560 });
@@ -57,7 +59,24 @@ export default function WorldMap({ frame, highlightIds, links, onSelectPolity }:
         select(svg).select('g.map-zoom').attr('transform', event.transform.toString());
       });
     select(svg).call(resetBehavior.transform, zoomIdentity);
-  }, [frame.year]);
+  }, [resetKey]);
+
+  const renderArcs = (arcList: GlobalLink[], className: string) =>
+    arcList.flatMap((link, index) => {
+      const from = countries.find((country) => country.name === link.from);
+      const to = countries.find((country) => country.name === link.to);
+      if (!from || !to) return [];
+      const p1 = projection(geoCentroid(from.geometry as never));
+      const p2 = projection(geoCentroid(to.geometry as never));
+      if (!p1 || !p2) return [];
+      const midX = (p1[0] + p2[0]) / 2;
+      const midY = (p1[1] + p2[1]) / 2;
+      const distance = Math.hypot(p2[0] - p1[0], p2[1] - p1[1]);
+      const arcHeight = Math.min(70, distance * 0.35);
+      const controlY = midY - arcHeight;
+      const arc = `M${p1[0]},${p1[1]} Q${midX},${controlY} ${p2[0]},${p2[1]}`;
+      return [<path key={`${className}-${index}`} className={className} d={arc} />];
+    });
 
   return (
     <div ref={containerRef} className="map-canvas">
@@ -80,21 +99,8 @@ export default function WorldMap({ frame, highlightIds, links, onSelectPolity }:
               </path>
             );
           })}
-          {links.map((link, index) => {
-            const from = countries.find((country) => country.name === link.from);
-            const to = countries.find((country) => country.name === link.to);
-            if (!from || !to) return null;
-            const p1 = projection(geoCentroid(from.geometry as never));
-            const p2 = projection(geoCentroid(to.geometry as never));
-            if (!p1 || !p2) return null;
-            const midX = (p1[0] + p2[0]) / 2;
-            const midY = (p1[1] + p2[1]) / 2;
-            const distance = Math.hypot(p2[0] - p1[0], p2[1] - p1[1]);
-            const arcHeight = Math.min(70, distance * 0.35);
-            const controlY = midY - arcHeight;
-            const arc = `M${p1[0]},${p1[1]} Q${midX},${controlY} ${p2[0]},${p2[1]}`;
-            return <path key={`global-link-${index}`} className="global-link" d={arc} />;
-          })}
+          {renderArcs(links, 'global-link')}
+          {renderArcs(flows, 'migration-flow')}
         </g>
       </svg>
     </div>

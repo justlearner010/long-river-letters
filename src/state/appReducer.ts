@@ -43,7 +43,7 @@ export const initialAppState: AppState = {
   selectedPolityId: null,
   selectedEventId: null,
   playbackEventId: null,
-  playbackMode: 'slice',
+  playbackMode: 'event',
   drawerOpen: false,
 };
 

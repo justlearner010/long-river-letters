@@ -63,6 +63,8 @@ body {
 .country:hover { opacity: 1; stroke-width: .9; }
 .country.highlight { fill: var(--accent); stroke: #6f2a1f; stroke-width: .8; }
 .global-link { fill: none; stroke: var(--gold); stroke-width: 1.6; stroke-dasharray: 5 4; opacity: .85; pointer-events: none; }
+.migration-flow { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 8 6; opacity: .95; pointer-events: none; animation: flowDash 1.2s linear infinite; }
+@keyframes flowDash { to { stroke-dashoffset: -28; } }
 .map-caption { position: absolute; left: 250px; top: 16px; z-index: 5; display: flex; align-items: center; gap: 10px; max-width: min(480px, 60%); background: rgba(250,242,220,.95); border: 1px solid var(--ink-soft); border-radius: 6px; padding: 8px 12px; box-shadow: 0 4px 16px rgba(60,40,20,.18); }
 .map-caption .caption-year { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
 .map-caption strong { color: var(--ink); font-size: 14px; }
@@ -83,7 +85,7 @@ body {
 .slice-button.active { color: var(--accent); font-weight: 700; }
 .time-scrubber { position: absolute; left: 250px; right: 18px; bottom: 16px; display: flex; align-items: center; gap: 12px; background: rgba(240,228,199,.94); border: 1px solid var(--ink-soft); border-radius: 6px; padding: 10px 14px; z-index: 4; }
 .scrubber-year { min-width: 54px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
-.event-cards { position: absolute; left: 250px; right: 18px; bottom: 128px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; z-index: 3; }
+.event-cards { position: absolute; left: 250px; right: 18px; bottom: 128px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; z-index: 3; overflow-y: auto; max-height: 38vh; align-content: start; }
 .event-card { display: flex; gap: 8px; border: 1px solid var(--ink-soft); background: rgba(248,238,214,.9); color: var(--ink); border-radius: 6px; padding: 8px 10px; cursor: pointer; text-align: left; min-height: 56px; }
 .event-year { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
 .event-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }

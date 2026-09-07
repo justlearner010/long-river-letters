@@ -84,7 +84,7 @@ export default function App() {
       } else {
         dispatch({ type: 'TOGGLE_PLAY' });
       }
-    }, 2500);
+    }, 2000);
     return () => window.clearInterval(timer);
   }, [state.playing, state.playbackMode, chapterSlicesList, slice.id, playbackIndex, allEvents]);
 
@@ -120,6 +120,7 @@ export default function App() {
     : state.playing && state.playbackMode === 'slice'
       ? playbackLinks
       : [];
+  const flows = activeEvent?.flows ?? [];
   const captionTitle = activeEvent?.title
     ?? (state.playing && state.playbackMode === 'slice'
       ? sliceFeaturedEvents.map((event) => event.title).join(' / ')
@@ -143,6 +144,8 @@ export default function App() {
           frame={frame}
           highlightIds={highlightIds}
           links={links}
+          flows={flows}
+          resetKey={chapter.id}
           onSelectPolity={(polityId) => dispatch({ type: 'SELECT_POLITY', polityId })}
         />
         {(activeEvent || (state.playing && state.playbackMode === 'slice')) && (
@@ -200,7 +203,7 @@ export default function App() {
           onTogglePlay={() => dispatch({ type: 'TOGGLE_PLAY' })}
         />
         <EventCards
-          events={state.search || state.category !== 'all' || state.region !== 'all' ? visibleEvents : featuredEvents}
+          events={visibleEvents}
           onSelectEvent={(eventId) => {
             dispatch({ type: 'SELECT_EVENT', eventId });
             dispatch({ type: 'SET_PLAYBACK_EVENT', eventId });
