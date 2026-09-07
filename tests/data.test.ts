@@ -7,6 +7,7 @@ import { polities } from '../src/data/polities';
 import { polityRules } from '../src/data/polityRules';
 import { ownerForYear } from '../src/lib/attribution';
 import { eventDetails } from '../src/data/eventDetails';
+import { enrichedEvents } from '../src/lib/enrichEvents';
 
 describe('world data validation', () => {
   it('reports no structural errors', () => {
@@ -32,6 +33,20 @@ describe('world data validation', () => {
       return !detail || !detail.cause || !detail.effect;
     });
     expect(missing.map((event) => event.id)).toEqual([]);
+  });
+
+  it('every event has at least one country association', () => {
+    const missing = enrichedEvents.filter((event) => event.polityIds.length === 0);
+    expect(missing.map((event) => event.id)).toEqual([]);
+  });
+
+  it('major events carry a duration range', () => {
+    const multiYear = ['e102', 'e131', 'e170', 'e188', 'e197'];
+    const missing = multiYear.filter((id) => {
+      const event = enrichedEvents.find((item) => item.id === id);
+      return !event || event.startYear === undefined;
+    });
+    expect(missing).toEqual([]);
   });
 
   it('attributes China to the right polity in key years', () => {

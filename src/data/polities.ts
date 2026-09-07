@@ -59,4 +59,8 @@ export const polities: Polity[] = [
   { id: 'songhai', nameZh: '桑海帝国', nameEn: 'Songhai Empire', type: 'empire', startYear: 1464, endYear: 1591, color: '#b59f4f', summary: '西非最大帝国之一，被摩洛哥火器部队重创。', relatedEventIds: [] },
   { id: 'kongo', nameZh: '刚果王国', nameEn: 'Kingdom of Kongo', type: 'kingdom', startYear: 1390, endYear: 1857, color: '#7f8f6f', summary: '中非刚果河口的贸易王国，与葡萄牙关系密切。', relatedEventIds: [] },
   { id: 'ethiopia', nameZh: '埃塞俄比亚', nameEn: 'Ethiopia', type: 'kingdom', startYear: 1300, endYear: 2026, color: '#8f7d3f', summary: '非洲之角的古老基督教国家，成功抵抗殖民瓜分。', relatedEventIds: ['e185'] },
+  { id: 'egypt', nameZh: '埃及', nameEn: 'Egypt', type: 'republic', startYear: 1953, endYear: 2026, color: '#8a8f4f', summary: '从法老文明到现代共和国，中东与北非的关键国家。', relatedEventIds: ['e203', 'e217'] },
+  { id: 'libya', nameZh: '利比亚', nameEn: 'Libya', type: 'republic', startYear: 1951, endYear: 2026, color: '#9a8a4f', summary: '北非石油国，经历君主制、卡扎菲时代与内战后重建。', relatedEventIds: ['e217'] },
+  { id: 'syria', nameZh: '叙利亚', nameEn: 'Syria', type: 'republic', startYear: 1946, endYear: 2026, color: '#8f6f4f', summary: '西亚古国，2011 年后陷入长期内战与区域博弈。', relatedEventIds: ['e217'] },
+  { id: 'israel', nameZh: '以色列', nameEn: 'Israel', type: 'republic', startYear: 1948, endYear: 2026, color: '#4f7f9f', summary: '1948 年建国的中东国家，与周边长期处于冲突状态。', relatedEventIds: ['e199', 'e225'] },
 ];

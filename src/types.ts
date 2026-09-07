@@ -41,6 +41,8 @@ export interface Polity {
 export interface WorldEvent {
   id: string;
   year: number;
+  startYear?: number;
+  endYear?: number;
   title: string;
   summary: string;
   cause?: string;

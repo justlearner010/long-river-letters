@@ -14,4 +14,20 @@ describe('appReducer', () => {
     const next = appReducer(initialAppState, { type: 'TOGGLE_PLAY' });
     expect(next.playing).toBe(true);
   });
+
+  it('sets playback event without clearing selection', () => {
+    const next = appReducer(initialAppState, { type: 'SET_PLAYBACK_EVENT', eventId: 'e101' });
+    expect(next.playbackEventId).toBe('e101');
+  });
+
+  it('syncs frame while preserving play state', () => {
+    const next = appReducer({ ...initialAppState, playing: true }, {
+      type: 'SYNC_FRAME',
+      chapterId: 'c2',
+      sliceId: 's1453',
+    });
+    expect(next.chapterId).toBe('c2');
+    expect(next.sliceId).toBe('s1453');
+    expect(next.playing).toBe(true);
+  });
 });

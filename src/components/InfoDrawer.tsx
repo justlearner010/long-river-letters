@@ -25,8 +25,18 @@ export default function InfoDrawer({ open, polity, event, onClose }: InfoDrawerP
     <aside className="info-drawer" role="dialog" aria-label="详情">
       <button type="button" className="drawer-close" onClick={onClose} aria-label="关闭">×</button>
       <h2 tabIndex={0}>{title}</h2>
-      {polity?.nameEn && <p className="drawer-sub">{polity.nameEn} · {polity.type}</p>}
-      {event && <p className="drawer-sub">{event.year} · {event.regions.join(' / ')}</p>}
+      {polity?.nameEn && (
+        <p className="drawer-sub">
+          {polity.nameEn} · {polity.type}
+          {polity.startYear !== undefined && ` · ${polity.startYear}–${polity.endYear ?? '今'}`}
+        </p>
+      )}
+      {event && (
+        <p className="drawer-sub">
+          {event.year} · {event.regions.join(' / ')}
+          {event.startYear !== undefined && ` · 持续 ${event.startYear}–${event.endYear ?? event.year}`}
+        </p>
+      )}
       <p className="drawer-summary">{summary}</p>
       {event?.cause && (
         <section className="drawer-section">

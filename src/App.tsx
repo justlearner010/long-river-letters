@@ -15,6 +15,7 @@ import ChapterRail from './components/ChapterRail';
 import TimeScrubber from './components/TimeScrubber';
 import EventCards from './components/EventCards';
 import InfoDrawer from './components/InfoDrawer';
+import PlaybackBar from './components/PlaybackBar';
 import WorldMap from './components/WorldMap';
 
 export default function App() {
@@ -28,6 +29,9 @@ export default function App() {
   const chapterSlicesList = useMemo(() => chapterSlices(chapter.id), [chapter.id]);
   const slice = chapterSlicesList.find((s) => s.id === state.sliceId) ?? chapterSlicesList[0];
   const countryNames = useMemo(() => loadCountries().map((country) => country.name), []);
+  const allEvents = useMemo(() => [...events].sort((a, b) => a.year - b.year), [events]);
+  const playbackIndex = allEvents.findIndex((event) => event.id === state.playbackEventId);
+  const playbackEvent = playbackIndex >= 0 ? allEvents[playbackIndex] : null;
   const frame = useMemo(
     () => buildAttributionFrame(slice.year, polityRules, countryNames),
     [slice.year, countryNames, polityRules],
@@ -49,6 +53,11 @@ export default function App() {
   );
   const selectedEvent = events.find((e) => e.id === state.selectedEventId) ?? null;
   const selectedPolity = polities.find((p) => p.id === state.selectedPolityId) ?? null;
+  const activeEvent = state.selectedEventId
+    ? selectedEvent
+    : state.playbackMode === 'event' && state.playbackEventId
+      ? playbackEvent
+      : null;
 
   useEffect(() => {
     saveState({ chapterId: state.chapterId, sliceId: state.sliceId, category: state.category, region: state.region });
@@ -56,17 +65,40 @@ export default function App() {
 
   useEffect(() => {
     if (!state.playing) return;
+    if (state.playbackMode === 'slice') {
+      const timer = window.setInterval(() => {
+        const currentIndex = chapterSlicesList.findIndex((s) => s.id === slice.id);
+        const next = chapterSlicesList[currentIndex + 1];
+        if (next) {
+          dispatch({ type: 'SELECT_SLICE', sliceId: next.id });
+        } else {
+          dispatch({ type: 'TOGGLE_PLAY' });
+        }
+      }, 3000);
+      return () => window.clearInterval(timer);
+    }
     const timer = window.setInterval(() => {
-      const currentIndex = chapterSlicesList.findIndex((s) => s.id === slice.id);
-      const next = chapterSlicesList[currentIndex + 1];
-      if (next) {
-        dispatch({ type: 'SELECT_SLICE', sliceId: next.id });
+      const nextIndex = playbackIndex + 1;
+      if (nextIndex < allEvents.length) {
+        dispatch({ type: 'SET_PLAYBACK_EVENT', eventId: allEvents[nextIndex].id });
       } else {
         dispatch({ type: 'TOGGLE_PLAY' });
       }
-    }, 3000);
+    }, 2500);
     return () => window.clearInterval(timer);
-  }, [state.playing, chapterSlicesList, slice.id]);
+  }, [state.playing, state.playbackMode, chapterSlicesList, slice.id, playbackIndex, allEvents]);
+
+  useEffect(() => {
+    if (state.playbackMode !== 'event' || !state.playbackEventId) return;
+    const targetEvent = events.find((event) => event.id === state.playbackEventId);
+    if (!targetEvent) return;
+    const targetChapter = chapters.find((c) => c.id === targetEvent.chapterId) ?? chapter;
+    const candidates = chapterSlices(targetChapter.id);
+    const targetSlice = candidates.filter((candidate) => candidate.year <= targetEvent.year).at(-1) ?? candidates[0];
+    if (targetSlice && (targetSlice.id !== state.sliceId || targetChapter.id !== state.chapterId)) {
+      dispatch({ type: 'SYNC_FRAME', chapterId: targetChapter.id, sliceId: targetSlice.id });
+    }
+  }, [state.playbackMode, state.playbackEventId, state.chapterId, state.sliceId, chapter, events]);
 
   const playbackHighlightIds = useMemo(
     () => Array.from(new Set(sliceFeaturedEvents.flatMap((event) => event.polityIds))),
@@ -76,22 +108,22 @@ export default function App() {
     () => sliceFeaturedEvents.flatMap((event) => event.links ?? []) as GlobalLink[],
     [sliceFeaturedEvents],
   );
-  const highlightIds =
-    state.selectedEventId
-      ? (selectedEvent?.polityIds ?? [])
-      : state.playing
-        ? playbackHighlightIds
-        : state.selectedPolityId
-          ? [state.selectedPolityId]
-          : [];
-  const links = state.selectedEventId
-    ? (selectedEvent?.links ?? [])
-    : state.playing
+  const highlightIds = activeEvent
+    ? activeEvent.polityIds
+    : state.playing && state.playbackMode === 'slice'
+      ? playbackHighlightIds
+      : state.selectedPolityId
+        ? [state.selectedPolityId]
+        : [];
+  const links = activeEvent
+    ? (activeEvent.links ?? [])
+    : state.playing && state.playbackMode === 'slice'
       ? playbackLinks
       : [];
-  const captionTitle = state.selectedEventId
-    ? (selectedEvent?.title ?? '')
-    : sliceFeaturedEvents.map((event) => event.title).join(' / ');
+  const captionTitle = activeEvent?.title
+    ?? (state.playing && state.playbackMode === 'slice'
+      ? sliceFeaturedEvents.map((event) => event.title).join(' / ')
+      : '');
 
   return (
     <main className="app-shell">
@@ -113,7 +145,7 @@ export default function App() {
           links={links}
           onSelectPolity={(polityId) => dispatch({ type: 'SELECT_POLITY', polityId })}
         />
-        {(state.playing || state.selectedEventId) && (
+        {(activeEvent || (state.playing && state.playbackMode === 'slice')) && (
           <div className="map-caption" aria-live="polite">
             <span className="caption-year">{slice.year}</span>
             <strong>{captionTitle}</strong>
@@ -127,6 +159,39 @@ export default function App() {
           onSelectChapter={(chapterId) => dispatch({ type: 'SELECT_CHAPTER', chapterId })}
           onSelectSlice={(sliceId) => dispatch({ type: 'SELECT_SLICE', sliceId })}
         />
+        <PlaybackBar
+          mode={state.playbackMode}
+          playing={state.playing}
+          currentEvent={playbackEvent}
+          label={`${chapter.title} · ${slice.label}`}
+          index={state.playbackMode === 'event' ? Math.max(0, playbackIndex) : chapterSlicesList.findIndex((s) => s.id === slice.id)}
+          total={state.playbackMode === 'event' ? allEvents.length : chapterSlicesList.length}
+          onTogglePlay={() => dispatch({ type: 'TOGGLE_PLAY' })}
+          onPrev={() => {
+            if (state.playbackMode === 'event') {
+              const index = Math.max(0, playbackIndex - 1);
+              dispatch({ type: 'SET_PLAYBACK_EVENT', eventId: allEvents[index]?.id ?? null });
+            } else {
+              const index = Math.max(0, chapterSlicesList.findIndex((s) => s.id === slice.id) - 1);
+              dispatch({ type: 'SELECT_SLICE', sliceId: chapterSlicesList[index]?.id ?? slice.id });
+            }
+          }}
+          onNext={() => {
+            if (state.playbackMode === 'event') {
+              const index = Math.min(allEvents.length - 1, playbackIndex + 1);
+              dispatch({ type: 'SET_PLAYBACK_EVENT', eventId: allEvents[index]?.id ?? null });
+            } else {
+              const index = Math.min(chapterSlicesList.length - 1, chapterSlicesList.findIndex((s) => s.id === slice.id) + 1);
+              dispatch({ type: 'SELECT_SLICE', sliceId: chapterSlicesList[index]?.id ?? slice.id });
+            }
+          }}
+          onModeChange={(mode) => {
+            dispatch({ type: 'SET_PLAYBACK_MODE', mode });
+            if (mode === 'event' && allEvents.length > 0) {
+              dispatch({ type: 'SET_PLAYBACK_EVENT', eventId: state.playbackEventId ?? allEvents[0].id });
+            }
+          }}
+        />
         <TimeScrubber
           slices={chapterSlicesList}
           activeSliceId={slice.id}
@@ -136,7 +201,10 @@ export default function App() {
         />
         <EventCards
           events={state.search || state.category !== 'all' || state.region !== 'all' ? visibleEvents : featuredEvents}
-          onSelectEvent={(eventId) => dispatch({ type: 'SELECT_EVENT', eventId })}
+          onSelectEvent={(eventId) => {
+            dispatch({ type: 'SELECT_EVENT', eventId });
+            dispatch({ type: 'SET_PLAYBACK_EVENT', eventId });
+          }}
         />
         <InfoDrawer
           open={state.drawerOpen}

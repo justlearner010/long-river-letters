@@ -4,7 +4,7 @@ export const events: WorldEvent[] = [
   // c1 蒙元余晖
   { id: 'e101', year: 1304, title: '蒙古诸汗国名义和解', summary: '元朝与四大汗国短暂恢复名义上的宗藩关系，蒙古世界体系最后一次整合。', category: 'organization', regions: ['东亚', '中亚'], polityIds: ['yuan', 'mongol-khanates'], chapterId: 'c1', importance: 2 },
   { id: 'e102', year: 1337, title: '百年战争爆发', summary: '英法因王位继承与领土争端开战，战争持续一个多世纪并塑造民族意识。', category: 'war', regions: ['欧洲'], polityIds: ['england', 'france'], chapterId: 'c1', importance: 2, featured: true },
-  { id: 'e103', year: 1347, title: '黑死病登陆欧洲', summary: '鼠疫大流行造成欧洲人口锐减，劳动力、地租与社会结构剧烈改变。', category: 'culture', regions: ['欧洲'], polityIds: [], chapterId: 'c1', importance: 3, featured: false },
+  { id: 'e103', year: 1347, title: '黑死病登陆欧洲', summary: '鼠疫大流行造成欧洲人口锐减，劳动力、地租与社会结构剧烈改变。', category: 'culture', regions: ['欧洲'], polityIds: ['france', 'england', 'germany', 'italy', 'spain'], chapterId: 'c1', importance: 3, featured: false },
   { id: 'e104', year: 1368, title: '明朝建立', summary: '朱元璋建立明朝，元廷退回草原，东亚政治版图进入新周期。', category: 'revolution', regions: ['东亚'], polityIds: ['yuan', 'ming'], chapterId: 'c1', importance: 3, featured: true },
   { id: 'e105', year: 1370, title: '帖木儿帝国兴起', summary: '帖木儿以撒马尔罕为中心建立横跨中亚与波斯的征服帝国。', category: 'war', regions: ['中亚', '西亚'], polityIds: ['timurid'], chapterId: 'c1', importance: 2 },
   { id: 'e106', year: 1380, title: '库利科沃战役', summary: '莫斯科大公击败金帐汗国军队，罗斯政治重心朝莫斯科转移。', category: 'war', regions: ['欧洲'], polityIds: ['mongol-khanates', 'moscow-rus'], chapterId: 'c1', importance: 2 },
@@ -15,7 +15,7 @@ export const events: WorldEvent[] = [
   { id: 'e110', year: 1405, title: '郑和首航', summary: '明朝船队从南京出发下西洋，海上朝贡网络一度扩展至印度洋。', category: 'economy', regions: ['东亚', '东南亚', '南亚', '西亚'], polityIds: ['ming'], chapterId: 'c2', importance: 3, featured: true },
   { id: 'e111', year: 1415, title: '阿金库尔战役与休达', summary: '英格兰重创法国骑兵，葡萄牙则占领北非休达，开启欧洲海外扩张。', category: 'war', regions: ['欧洲', '北非'], polityIds: ['england', 'france', 'portugal'], chapterId: 'c2', importance: 2 },
   { id: 'e112', year: 1431, title: '圣女贞德就义', summary: '法国民族情感因贞德而强化，百年战争向法国胜利方向转变。', category: 'culture', regions: ['欧洲'], polityIds: ['france', 'england'], chapterId: 'c2', importance: 2 },
-  { id: 'e113', year: 1450, title: '谷登堡印刷术', summary: '活字印刷在欧洲普及，知识传播速度改变宗教、科学与政治。', category: 'tech', regions: ['欧洲'], polityIds: [], chapterId: 'c2', importance: 3, featured: true },
+  { id: 'e113', year: 1450, title: '谷登堡印刷术', summary: '活字印刷在欧洲普及，知识传播速度改变宗教、科学与政治。', category: 'tech', regions: ['欧洲'], polityIds: ['germany'], chapterId: 'c2', importance: 3, featured: true },
   { id: 'e114', year: 1453, title: '君士坦丁堡陷落', summary: '奥斯曼攻陷拜占庭首都，结束千年帝国并控制黑海与地中海贸易要道。', category: 'war', regions: ['欧洲', '西亚'], polityIds: ['byzantine', 'ottoman'], chapterId: 'c2', importance: 3, featured: true },
   { id: 'e115', year: 1469, title: '伊莎贝拉与斐迪南联姻', summary: '卡斯蒂利亚与阿拉贡联合，为统一西班牙和海外扩张奠基。', category: 'treaty', regions: ['欧洲'], polityIds: ['spain'], chapterId: 'c2', importance: 2 },
   { id: 'e116', year: 1485, title: '都铎王朝建立', summary: '博斯沃思战役结束玫瑰战争，英格兰进入中央集权时代。', category: 'revolution', regions: ['欧洲'], polityIds: ['england'], chapterId: 'c2', importance: 2 },
@@ -61,7 +61,7 @@ export const events: WorldEvent[] = [
   { id: 'e152', year: 1830, title: '七月革命与拉美独立', summary: '法国七月革命推翻复辟王朝，大哥伦比亚解体推动南美多国格局。', category: 'revolution', regions: ['欧洲', '拉美'], polityIds: ['france', 'gran-colombia', 'mexico'], chapterId: 'c6', importance: 2 },
   { id: 'e153', year: 1842, title: '南京条约', summary: '鸦片战争后清廷割让香港并开放五口通商，中国进入条约体系。', category: 'treaty', regions: ['东亚'], polityIds: ['qing', 'united-kingdom'], chapterId: 'c6', importance: 3, featured: true },
   { id: 'e154', year: 1848, title: '欧洲革命年', summary: '革命从巴黎蔓延至维也纳、柏林与意大利，民族主义力量全面爆发。', category: 'revolution', regions: ['欧洲'], polityIds: ['france', 'habsburg', 'prussia', 'holy-roman'], chapterId: 'c6', importance: 3, featured: true },
-  { id: 'e155', year: 1848, title: '共产党宣言发表', summary: '马克思与恩格斯发表宣言，社会主义成为影响世界的重要思想。', category: 'culture', regions: ['欧洲', '全球'], polityIds: [], chapterId: 'c6', importance: 3, featured: true },
+  { id: 'e155', year: 1848, title: '共产党宣言发表', summary: '马克思与恩格斯发表宣言，社会主义成为影响世界的重要思想。', category: 'culture', regions: ['欧洲', '全球'], polityIds: ['germany', 'united-kingdom', 'france'], chapterId: 'c6', importance: 3, featured: true },
   { id: 'e156', year: 1853, title: '黑船来航', summary: '美国舰队迫使日本开港，日本被迫进入近代国际体系。', category: 'treaty', regions: ['东亚'], polityIds: ['japan-shogunate', 'usa'], chapterId: 'c6', importance: 2 },
   { id: 'e157', year: 1861, title: '美国内战与俄国农奴制改革', summary: '美国内战决定联邦与废奴方向，俄国废除农奴制开启近代改革。', category: 'war', regions: ['北美', '欧洲'], polityIds: ['usa', 'russia-empire'], chapterId: 'c6', importance: 3, featured: true },
   { id: 'e158', year: 1868, title: '明治维新', summary: '日本推翻幕府并推行西化改革，成为亚洲第一个近代列强。', category: 'revolution', regions: ['东亚'], polityIds: ['japan-shogunate', 'japan-empire'], chapterId: 'c6', importance: 3, featured: true },
@@ -88,7 +88,7 @@ export const events: WorldEvent[] = [
   { id: 'e177', year: 1918, title: '德意志帝国崩溃与停战', summary: '德国革命推翻帝制，协约国与德国停战，四大帝国随之瓦解。', category: 'treaty', regions: ['欧洲'], polityIds: ['german-empire', 'austria-hungary', 'ottoman', 'united-kingdom'], chapterId: 'c8', importance: 3, featured: true },
   // c9 凡尔赛与大萧条
   { id: 'e178', year: 1919, title: '凡尔赛条约', summary: '巴黎和会对德严苛清算并重绘东欧版图，埋下下一轮冲突种子。', category: 'treaty', regions: ['欧洲', '全球'], polityIds: ['germany', 'france', 'united-kingdom', 'usa'], chapterId: 'c9', importance: 3, featured: true },
-  { id: 'e179', year: 1920, title: '国际联盟成立', summary: '人类首次建立普遍性国际组织，但因列强缺席与缺乏强制力而脆弱。', category: 'organization', regions: ['全球'], polityIds: [], chapterId: 'c9', importance: 3, featured: true },
+  { id: 'e179', year: 1920, title: '国际联盟成立', summary: '人类首次建立普遍性国际组织，但因列强缺席与缺乏强制力而脆弱。', category: 'organization', regions: ['全球'], polityIds: ['usa', 'france', 'united-kingdom'], chapterId: 'c9', importance: 3, featured: true },
   { id: 'e180', year: 1922, title: '苏联成立与墨索里尼上台', summary: '苏维埃联盟成立，意大利法西斯政权建立，极权主义登上舞台。', category: 'revolution', regions: ['欧洲'], polityIds: ['ussr', 'italy'], chapterId: 'c9', importance: 3, featured: true },
   { id: 'e181', year: 1923, title: '土耳其共和国成立', summary: '洛桑条约承认土耳其新边界，奥斯曼帝国正式终结。', category: 'revolution', regions: ['西亚'], polityIds: ['ottoman'], chapterId: 'c9', importance: 2 },
   { id: 'e182', year: 1929, title: '华尔街股灾', summary: '纽约股市崩盘引发全球大萧条，自由放任经济模式受到根本质疑。', category: 'economy', regions: ['北美', '全球'], polityIds: ['usa'], chapterId: 'c9', importance: 3, featured: true },
@@ -130,7 +130,7 @@ export const events: WorldEvent[] = [
   { id: 'e215', year: 2008, title: '全球金融危机与G20', summary: '美国次贷危机演变为全球衰退，G20 升格为国际经济协调平台。', category: 'economy', regions: ['北美', '全球'], polityIds: ['usa', 'china-prc'], chapterId: 'c12', importance: 3, featured: true },
   { id: 'e216', year: 2010, title: '中国GDP超过日本', summary: '中国经济总量升至世界第二，东亚经济重心进一步向中国转移。', category: 'economy', regions: ['东亚', '全球'], polityIds: ['china-prc', 'japan'], chapterId: 'c12', importance: 2 },
   // c13 多极竞争
-  { id: 'e217', year: 2011, title: '阿拉伯之春', summary: '北非中东的抗议浪潮推翻多个政权，也引发利比亚、叙利亚等长期冲突。', category: 'revolution', regions: ['北非', '西亚'], polityIds: [], chapterId: 'c13', importance: 3, featured: true },
+  { id: 'e217', year: 2011, title: '阿拉伯之春', summary: '北非中东的抗议浪潮推翻多个政权，也引发利比亚、叙利亚等长期冲突。', category: 'revolution', regions: ['北非', '西亚'], polityIds: ['egypt', 'libya', 'syria'], chapterId: 'c13', importance: 3, featured: true },
   { id: 'e218', year: 2013, title: '一带一路倡议', summary: '中国提出跨境基础设施与贸易网络，全球基础设施格局出现新轴线。', category: 'economy', regions: ['全球'], polityIds: ['china-prc'], chapterId: 'c13', importance: 3, featured: true },
   { id: 'e219', year: 2014, title: '克里米亚危机', summary: '俄罗斯并吞克里米亚并支持东乌分离，欧洲安全秩序受到直接挑战。', category: 'war', regions: ['欧洲'], polityIds: ['russia-federation', 'usa'], chapterId: 'c13', importance: 3, featured: true },
   { id: 'e220', year: 2015, title: '巴黎气候协定', summary: '近两百个国家通过气候协定，气候治理成为多极世界关键议题。', category: 'treaty', regions: ['全球'], polityIds: ['china-prc', 'usa', 'france'], chapterId: 'c13', importance: 3, featured: true },
@@ -138,6 +138,6 @@ export const events: WorldEvent[] = [
   { id: 'e222', year: 2018, title: '中美贸易战', summary: '美国对华加征关税并限制技术流转，两大经济体进入竞争性并行时代。', category: 'economy', regions: ['北美', '东亚', '全球'], polityIds: ['usa', 'china-prc'], chapterId: 'c13', importance: 3, featured: true },
   { id: 'e223', year: 2020, title: '新冠疫情', summary: '疫情冲击全球供应链与公共财政，各国治理能力与国际合作受到考验。', category: 'economy', regions: ['全球'], polityIds: ['china-prc', 'usa', 'france', 'germany'], chapterId: 'c13', importance: 2 },
   { id: 'e224', year: 2022, title: '俄乌战争', summary: '俄罗斯全面入侵乌克兰，欧洲安全、能源与全球阵营结构发生剧变。', category: 'war', regions: ['欧洲'], polityIds: ['russia-federation', 'usa', 'germany', 'france', 'united-kingdom'], chapterId: 'c13', importance: 3, featured: true },
-  { id: 'e225', year: 2023, title: '巴以冲突升级', summary: '新一轮中东战争使地区和平进程受挫，多极博弈更趋复杂。', category: 'war', regions: ['西亚'], polityIds: ['usa'], chapterId: 'c13', importance: 2 },
+  { id: 'e225', year: 2023, title: '巴以冲突升级', summary: '新一轮中东战争使地区和平进程受挫，多极博弈更趋复杂。', category: 'war', regions: ['西亚'], polityIds: ['israel', 'usa', 'iran-islamic'], chapterId: 'c13', importance: 2 },
   { id: 'e226', year: 2026, title: '多极世界格局', summary: '技术竞争、区域集团与全球南方同时崛起，国际秩序呈现多中心状态。', category: 'organization', regions: ['全球'], polityIds: ['usa', 'china-prc', 'russia-federation', 'india'], chapterId: 'c13', importance: 1, featured: true },
 ];

@@ -73,4 +73,8 @@ export const polityRules: PolityRule[] = [
   { polityId: 'songhai', countryNames: ['Mali', 'Niger'], from: 1464, to: 1591, priority: 4 },
   { polityId: 'kongo', countryNames: ['Angola', 'Dem. Rep. Congo'], from: 1390, to: 1857, priority: 4 },
   { polityId: 'ethiopia', countryNames: ['Ethiopia'], from: 1300, to: 2026, priority: 5 },
+  { polityId: 'egypt', countryNames: ['Egypt'], from: 1953, to: 2026, priority: 5 },
+  { polityId: 'libya', countryNames: ['Libya'], from: 1951, to: 2026, priority: 5 },
+  { polityId: 'syria', countryNames: ['Syria'], from: 1946, to: 2026, priority: 5 },
+  { polityId: 'israel', countryNames: ['Israel'], from: 1948, to: 2026, priority: 5 },
 ];
