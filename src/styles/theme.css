@@ -89,3 +89,10 @@ body {
 .info-drawer h2 { margin-top: 0; }
 .drawer-sub { color: var(--ink-soft); font-size: 13px; }
 .drawer-summary { line-height: 1.7; }
+
+.filter-chips { display: flex; gap: 6px; overflow-x: auto; max-width: 46vw; }
+.filter-chip { flex: none; border: 1px solid var(--ink-soft); background: var(--paper-deep); color: var(--ink); border-radius: 4px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
+.filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.region-field select { border: 1px solid var(--ink-soft); background: rgba(255,251,235,.7); color: var(--ink); padding: 5px 8px; border-radius: 4px; font-size: 12px; }
+.about-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(70,53,34,.45); z-index: 10; }
+.about-panel { width: min(620px, 90vw); max-height: 80vh; overflow-y: auto; background: var(--paper); border: 1px solid var(--ink-soft); border-radius: 8px; padding: 24px; }

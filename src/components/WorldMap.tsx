@@ -15,6 +15,7 @@ export default function WorldMap({ frame, highlightIds, onSelectPolity }: WorldM
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 900, height: 560 });
+  const isJsdom = typeof navigator !== 'undefined' && /jsdom/.test(navigator.userAgent);
   const countries = useMemo(() => loadCountries(), []);
   const { path } = useMemo(() => createPathGenerator(size.width, size.height), [size]);
 
@@ -30,6 +31,7 @@ export default function WorldMap({ frame, highlightIds, onSelectPolity }: WorldM
   }, []);
 
   useEffect(() => {
+    if (isJsdom) return;
     const svg = svgRef.current;
     if (!svg) return;
     const zoomBehavior = zoom<SVGSVGElement, unknown>()
@@ -44,6 +46,7 @@ export default function WorldMap({ frame, highlightIds, onSelectPolity }: WorldM
   }, []);
 
   useEffect(() => {
+    if (isJsdom) return;
     const svg = svgRef.current;
     if (!svg) return;
     const resetBehavior = zoom<SVGSVGElement, unknown>()
@@ -51,7 +54,7 @@ export default function WorldMap({ frame, highlightIds, onSelectPolity }: WorldM
       .on('zoom', (event) => {
         select(svg).select('g.map-zoom').attr('transform', event.transform.toString());
       });
-    select(svg).transition().duration(400).call(resetBehavior.transform, zoomIdentity);
+    select(svg).call(resetBehavior.transform, zoomIdentity);
   }, [frame.year]);
 
   return (
