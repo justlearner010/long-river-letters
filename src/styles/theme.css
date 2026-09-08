@@ -83,6 +83,13 @@ body {
 .slice-list { display: flex; flex-direction: column; gap: 2px; padding-left: 42px; }
 .slice-button { border: 0; background: transparent; color: var(--ink-soft); cursor: pointer; font-size: 12px; padding: 4px 6px; text-align: left; }
 .slice-button.active { color: var(--accent); font-weight: 700; }
+.sidebar-events { border-top: 1px solid rgba(111,91,62,.3); margin-top: 8px; padding-top: 8px; display: flex; flex-direction: column; gap: 2px; }
+.sidebar-events-title { font-size: 11px; color: var(--ink-soft); font-weight: 700; margin-bottom: 4px; }
+.sidebar-event { display: flex; gap: 6px; align-items: baseline; border: 0; background: transparent; color: var(--ink-soft); cursor: pointer; padding: 5px 6px; text-align: left; font-size: 12px; border-radius: 4px; }
+.sidebar-event:hover { background: rgba(57,95,120,.14); color: var(--ink); }
+.sidebar-event.active { background: rgba(159,62,43,.14); color: var(--accent); font-weight: 700; }
+.sidebar-event-year { color: var(--accent-2); font-weight: 700; min-width: 30px; font-variant-numeric: tabular-nums; }
+.sidebar-event-title { line-height: 1.35; min-width: 0; }
 .time-scrubber { position: absolute; left: 250px; right: 18px; bottom: 16px; display: flex; align-items: center; gap: 12px; background: rgba(240,228,199,.94); border: 1px solid var(--ink-soft); border-radius: 6px; padding: 10px 14px; z-index: 4; }
 .scrubber-year { min-width: 54px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
 .event-cards { position: absolute; left: 250px; right: 18px; bottom: 128px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; z-index: 3; overflow-y: auto; max-height: 38vh; align-content: start; }

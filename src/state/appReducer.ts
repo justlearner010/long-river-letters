@@ -51,12 +51,12 @@ export function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case 'SELECT_CHAPTER': {
       const chapter = chapters.find((c) => c.id === action.chapterId) ?? chapters[0];
-      return { ...state, chapterId: chapter.id, sliceId: chapter.sliceIds[0], playing: false, selectedEventId: null };
+      return { ...state, chapterId: chapter.id, sliceId: chapter.sliceIds[0], playing: false, selectedEventId: null, playbackEventId: null };
     }
     case 'SELECT_SLICE': {
       const chapter = chapters.find((c) => c.id === state.chapterId) ?? chapters[0];
       const slice = slices.find((s) => s.id === action.sliceId && s.chapterId === chapter.id);
-      return { ...state, sliceId: slice?.id ?? chapter.sliceIds[0], playing: false, selectedEventId: null };
+      return { ...state, sliceId: slice?.id ?? chapter.sliceIds[0], playing: false, selectedEventId: null, playbackEventId: null };
     }
     case 'TOGGLE_PLAY':
       return { ...state, playing: !state.playing };

@@ -58,6 +58,10 @@ export default function App() {
     : state.playbackMode === 'event' && state.playbackEventId
       ? playbackEvent
       : null;
+  const handleSelectEvent = (eventId: string) => {
+    dispatch({ type: 'SELECT_EVENT', eventId });
+    dispatch({ type: 'SET_PLAYBACK_EVENT', eventId });
+  };
 
   useEffect(() => {
     saveState({ chapterId: state.chapterId, sliceId: state.sliceId, category: state.category, region: state.region });
@@ -89,7 +93,7 @@ export default function App() {
   }, [state.playing, state.playbackMode, chapterSlicesList, slice.id, playbackIndex, allEvents]);
 
   useEffect(() => {
-    if (state.playbackMode !== 'event' || !state.playbackEventId) return;
+    if (!state.playbackEventId) return;
     const targetEvent = events.find((event) => event.id === state.playbackEventId);
     if (!targetEvent) return;
     const targetChapter = chapters.find((c) => c.id === targetEvent.chapterId) ?? chapter;
@@ -158,9 +162,12 @@ export default function App() {
           chapters={chapters}
           activeChapterId={chapter.id}
           activeSliceId={slice.id}
+          activeEventId={activeEvent?.id ?? null}
           slicesByChapter={chapterSlices}
+          events={visibleEvents}
           onSelectChapter={(chapterId) => dispatch({ type: 'SELECT_CHAPTER', chapterId })}
           onSelectSlice={(sliceId) => dispatch({ type: 'SELECT_SLICE', sliceId })}
+          onSelectEvent={handleSelectEvent}
         />
         <PlaybackBar
           mode={state.playbackMode}
@@ -204,10 +211,7 @@ export default function App() {
         />
         <EventCards
           events={visibleEvents}
-          onSelectEvent={(eventId) => {
-            dispatch({ type: 'SELECT_EVENT', eventId });
-            dispatch({ type: 'SET_PLAYBACK_EVENT', eventId });
-          }}
+          onSelectEvent={handleSelectEvent}
         />
         <InfoDrawer
           open={state.drawerOpen}
