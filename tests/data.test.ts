@@ -49,6 +49,26 @@ describe('world data validation', () => {
     expect(missing).toEqual([]);
   });
 
+  it('every event polity can be highlighted on the map', () => {
+    const ruled = new Set(polityRules.map((rule) => rule.polityId));
+    const missing = enrichedEvents.flatMap((event) =>
+      event.polityIds.filter((polityId) => !ruled.has(polityId)).map((polityId) => `${event.id}: ${polityId}`),
+    );
+    expect(missing).toEqual([]);
+  });
+
+  it('event duration ranges stay inside their chapter', () => {
+    const bad = enrichedEvents
+      .filter((event) => event.startYear !== undefined)
+      .filter((event) => {
+        const chapter = chapters.find((item) => item.id === event.chapterId);
+        if (!chapter) return true;
+        return event.startYear! < chapter.startYear || event.endYear! > chapter.endYear;
+      })
+      .map((event) => `${event.id}: ${event.startYear}–${event.endYear}`);
+    expect(bad).toEqual([]);
+  });
+
   it('attributes China to the right polity in key years', () => {
     expect(ownerForYear(polityRules, 1360, 'China')).toBe('yuan');
     expect(ownerForYear(polityRules, 1600, 'China')).toBe('ming');
