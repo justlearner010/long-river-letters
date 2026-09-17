@@ -7,10 +7,16 @@ interface PlaybackBarProps {
   label: string;
   index: number;
   total: number;
+  speed: number;
+  quizEnabled: boolean;
+  quizScore: number;
+  quizAnswered: number;
   onTogglePlay: () => void;
   onPrev: () => void;
   onNext: () => void;
   onModeChange: (mode: 'slice' | 'event') => void;
+  onSpeedChange: (speed: number) => void;
+  onToggleQuiz: () => void;
 }
 
 export default function PlaybackBar({
@@ -20,10 +26,16 @@ export default function PlaybackBar({
   label,
   index,
   total,
+  speed,
+  quizEnabled,
+  quizScore,
+  quizAnswered,
   onTogglePlay,
   onPrev,
   onNext,
   onModeChange,
+  onSpeedChange,
+  onToggleQuiz,
 }: PlaybackBarProps) {
   const yearRange = currentEvent?.startYear
     ? `${currentEvent.startYear}–${currentEvent.endYear ?? currentEvent.year}`
@@ -46,6 +58,19 @@ export default function PlaybackBar({
           事件播放
         </button>
       </div>
+      <div className="speed-toggle" role="group" aria-label="播放速度">
+        {[0.5, 1, 2, 4].map((s) => (
+          <button
+            key={s}
+            type="button"
+            className={`speed-chip ${speed === s ? 'active' : ''}`}
+            onClick={() => onSpeedChange(s)}
+            aria-label={`${s}x`}
+          >
+            {s}x
+          </button>
+        ))}
+      </div>
       <button type="button" className="step-button" onClick={onPrev} aria-label="上一个">‹</button>
       <button type="button" className="play-button" onClick={onTogglePlay} aria-label={playing ? '暂停' : '播放'}>
         {playing ? '暂停' : '播放'}
@@ -62,6 +87,20 @@ export default function PlaybackBar({
         </div>
         <span>{total}</span>
       </div>
+      <button
+        type="button"
+        className={`quiz-toggle ${quizEnabled ? 'active' : ''}`}
+        onClick={onToggleQuiz}
+        aria-label={quizEnabled ? '关闭测验模式' : '开启测验模式'}
+        title={quizEnabled ? '关闭测验模式' : '开启测验模式'}
+      >
+        测验
+      </button>
+      {quizEnabled && quizAnswered > 0 && (
+        <span className="quiz-score" aria-live="polite">
+          {quizScore}/{quizAnswered}
+        </span>
+      )}
     </div>
   );
 }

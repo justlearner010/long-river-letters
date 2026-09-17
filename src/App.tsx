@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { chapters } from './data/chapters';
 import { slices } from './data/slices';
 import { polities } from './data/polities';
@@ -17,6 +17,15 @@ import EventCards from './components/EventCards';
 import InfoDrawer from './components/InfoDrawer';
 import PlaybackBar from './components/PlaybackBar';
 import WorldMap from './components/WorldMap';
+import { usePlaybackScheduler } from './hooks/usePlaybackScheduler';
+import { getQuizPrompt } from './data/quizPrompts';
+import CausalGraph from './components/CausalGraph';
+import ViewToggle from './components/ViewToggle';
+import QuizCard from './components/QuizCard';
+import LetterView from './components/LetterView';
+import type { ObjectAttachment } from './components/LetterView';
+import { getLetterSpecsForIntent, letterSpecs } from './data/letters';
+import { figures } from './data/figures';
 
 export default function App() {
   const [state, dispatch] = useReducer(appReducer, initialAppState, (initial) => ({
@@ -53,44 +62,66 @@ export default function App() {
   );
   const selectedEvent = events.find((e) => e.id === state.selectedEventId) ?? null;
   const selectedPolity = polities.find((p) => p.id === state.selectedPolityId) ?? null;
+  const quizPendingEvent = state.quizPendingEventId ? getEnrichedEvent(state.quizPendingEventId) : null;
   const activeEvent = state.selectedEventId
     ? selectedEvent
-    : state.playbackMode === 'event' && state.playbackEventId
-      ? playbackEvent
-      : null;
-  const handleSelectEvent = (eventId: string) => {
+    : quizPendingEvent
+      ? null
+      : state.playbackMode === 'event' && state.playbackEventId
+        ? playbackEvent
+        : null;
+  const handleSelectEvent = useCallback((eventId: string) => {
     dispatch({ type: 'SELECT_EVENT', eventId });
     dispatch({ type: 'SET_PLAYBACK_EVENT', eventId });
-  };
+  }, []);
 
   useEffect(() => {
     saveState({ chapterId: state.chapterId, sliceId: state.sliceId, category: state.category, region: state.region });
   }, [state.chapterId, state.sliceId, state.category, state.region]);
 
-  useEffect(() => {
-    if (!state.playing) return;
+  const advancePlayback = useCallback(() => {
     if (state.playbackMode === 'slice') {
-      const timer = window.setInterval(() => {
-        const currentIndex = chapterSlicesList.findIndex((s) => s.id === slice.id);
-        const next = chapterSlicesList[currentIndex + 1];
-        if (next) {
-          dispatch({ type: 'SELECT_SLICE', sliceId: next.id });
-        } else {
-          dispatch({ type: 'TOGGLE_PLAY' });
-        }
-      }, 3000);
-      return () => window.clearInterval(timer);
-    }
-    const timer = window.setInterval(() => {
-      const nextIndex = playbackIndex + 1;
-      if (nextIndex < allEvents.length) {
-        dispatch({ type: 'SET_PLAYBACK_EVENT', eventId: allEvents[nextIndex].id });
+      const currentIndex = chapterSlicesList.findIndex((s) => s.id === slice.id);
+      const next = chapterSlicesList[currentIndex + 1];
+      if (next) {
+        dispatch({ type: 'SELECT_SLICE', sliceId: next.id });
       } else {
         dispatch({ type: 'TOGGLE_PLAY' });
       }
-    }, 2000);
-    return () => window.clearInterval(timer);
-  }, [state.playing, state.playbackMode, chapterSlicesList, slice.id, playbackIndex, allEvents]);
+    } else {
+      const nextIndex = playbackIndex + 1;
+      if (nextIndex < allEvents.length) {
+        const nextEvent = allEvents[nextIndex];
+        if (state.quizEnabled && getQuizPrompt(nextEvent.id)) {
+          dispatch({ type: 'SET_QUIZ_PENDING', eventId: nextEvent.id });
+          return;
+        }
+        dispatch({ type: 'SET_PLAYBACK_EVENT', eventId: nextEvent.id });
+      } else {
+        dispatch({ type: 'TOGGLE_PLAY' });
+      }
+    }
+  }, [state.playbackMode, state.quizEnabled, chapterSlicesList, slice.id, playbackIndex, allEvents]);
+
+  const handleQuizAnswer = useCallback((correct: boolean) => {
+    dispatch({ type: 'RECORD_QUIZ_ANSWER', correct });
+  }, []);
+
+  const handleQuizContinue = useCallback(() => {
+    const pendingId = state.quizPendingEventId;
+    dispatch({ type: 'SET_QUIZ_PENDING', eventId: null });
+    if (pendingId) {
+      dispatch({ type: 'SET_PLAYBACK_EVENT', eventId: pendingId });
+    }
+  }, [state.quizPendingEventId]);
+
+  usePlaybackScheduler({
+    playing: state.playing,
+    speed: state.playbackSpeed,
+    mode: state.playbackMode,
+    resetKey: state.playbackMode === 'event' ? state.playbackEventId ?? slice.id : slice.id,
+    onTick: advancePlayback,
+  });
 
   useEffect(() => {
     if (!state.playbackEventId) return;
@@ -112,23 +143,49 @@ export default function App() {
     () => sliceFeaturedEvents.flatMap((event) => event.links ?? []) as GlobalLink[],
     [sliceFeaturedEvents],
   );
-  const highlightIds = activeEvent
-    ? activeEvent.polityIds
-    : state.playing && state.playbackMode === 'slice'
-      ? playbackHighlightIds
-      : state.selectedPolityId
-        ? [state.selectedPolityId]
-        : [];
-  const links = activeEvent
-    ? (activeEvent.links ?? [])
-    : state.playing && state.playbackMode === 'slice'
-      ? playbackLinks
-      : [];
-  const flows = activeEvent?.flows ?? [];
+  const highlightIds = useMemo(
+    () =>
+      activeEvent
+        ? activeEvent.polityIds
+        : state.playing && state.playbackMode === 'slice'
+          ? playbackHighlightIds
+          : state.selectedPolityId
+            ? [state.selectedPolityId]
+            : [],
+    [activeEvent, state.playing, state.playbackMode, playbackHighlightIds, state.selectedPolityId],
+  );
+  const links = useMemo(
+    () => (activeEvent ? (activeEvent.links ?? []) : state.playing && state.playbackMode === 'slice' ? playbackLinks : []),
+    [activeEvent, state.playing, state.playbackMode, playbackLinks],
+  );
+  const flows = useMemo(() => activeEvent?.flows ?? [], [activeEvent]);
   const captionTitle = activeEvent?.title
     ?? (state.playing && state.playbackMode === 'slice'
       ? sliceFeaturedEvents.map((event) => event.title).join(' / ')
       : '');
+  const currentEventIdForCausal = state.selectedEventId ?? state.playbackEventId;
+
+  const letterObjects = useMemo(() => {
+    const map: Record<string, ObjectAttachment> = {};
+    for (const spec of letterSpecs) {
+      const figure = figures.find((candidate) => candidate.id === spec.figureId);
+      if (figure?.objectSrc && figure.objectLabel) {
+        map[spec.id] = { src: figure.objectSrc, label: figure.objectLabel };
+      }
+    }
+    return map;
+  }, []);
+
+  const handlePickIntent = useCallback((intentId: string) => {
+    dispatch({ type: 'SELECT_LETTER_INTENT', intentId });
+    const first = letterSpecs.find((spec) => spec.intentId === intentId);
+    if (first) dispatch({ type: 'SET_LETTER', letterId: first.id });
+  }, []);
+
+  const handleFocusLetterEvent = useCallback((eventId: string | null) => {
+    dispatch({ type: 'FOCUS_LETTER_EVENT', eventId });
+    if (eventId) handleSelectEvent(eventId);
+  }, [handleSelectEvent]);
 
   return (
     <main className="app-shell">
@@ -142,83 +199,136 @@ export default function App() {
         onFilter={(category) => dispatch({ type: 'SET_CATEGORY', category: category as typeof state.category })}
         onRegion={(region) => dispatch({ type: 'SET_REGION', region: region as typeof state.region })}
         onOpenAbout={() => setAboutOpen(true)}
+        onOpenLetters={() => dispatch({ type: 'OPEN_LETTERS' })}
       />
       <section className="map-stage">
-        <WorldMap
-          frame={frame}
-          highlightIds={highlightIds}
-          links={links}
-          flows={flows}
-          resetKey={chapter.id}
-          onSelectPolity={(polityId) => dispatch({ type: 'SELECT_POLITY', polityId })}
-        />
-        {(activeEvent || (state.playing && state.playbackMode === 'slice')) && (
+        {state.viewMode === 'map' ? (
+          <WorldMap
+            frame={frame}
+            highlightIds={highlightIds}
+            links={links}
+            flows={flows}
+            resetKey={chapter.id}
+            onSelectPolity={(polityId) => dispatch({ type: 'SELECT_POLITY', polityId })}
+          />
+        ) : (
+          <CausalGraph
+            events={allEvents}
+            currentEventId={currentEventIdForCausal}
+            onSelectEvent={handleSelectEvent}
+          />
+        )}
+        {!state.letterOpen && (activeEvent || (state.playing && state.playbackMode === 'slice')) && (
           <div className="map-caption" aria-live="polite">
             <span className="caption-year">{slice.year}</span>
             <strong>{captionTitle}</strong>
           </div>
         )}
-        <ChapterRail
-          chapters={chapters}
-          activeChapterId={chapter.id}
-          activeSliceId={slice.id}
-          activeEventId={activeEvent?.id ?? null}
-          slicesByChapter={chapterSlices}
-          events={visibleEvents}
-          onSelectChapter={(chapterId) => dispatch({ type: 'SELECT_CHAPTER', chapterId })}
-          onSelectSlice={(sliceId) => dispatch({ type: 'SELECT_SLICE', sliceId })}
-          onSelectEvent={handleSelectEvent}
-        />
-        <PlaybackBar
-          mode={state.playbackMode}
-          playing={state.playing}
-          currentEvent={playbackEvent}
-          label={`${chapter.title} · ${slice.label}`}
-          index={state.playbackMode === 'event' ? Math.max(0, playbackIndex) : chapterSlicesList.findIndex((s) => s.id === slice.id)}
-          total={state.playbackMode === 'event' ? allEvents.length : chapterSlicesList.length}
-          onTogglePlay={() => dispatch({ type: 'TOGGLE_PLAY' })}
-          onPrev={() => {
-            if (state.playbackMode === 'event') {
-              const index = Math.max(0, playbackIndex - 1);
-              dispatch({ type: 'SET_PLAYBACK_EVENT', eventId: allEvents[index]?.id ?? null });
-            } else {
-              const index = Math.max(0, chapterSlicesList.findIndex((s) => s.id === slice.id) - 1);
-              dispatch({ type: 'SELECT_SLICE', sliceId: chapterSlicesList[index]?.id ?? slice.id });
-            }
-          }}
-          onNext={() => {
-            if (state.playbackMode === 'event') {
-              const index = Math.min(allEvents.length - 1, playbackIndex + 1);
-              dispatch({ type: 'SET_PLAYBACK_EVENT', eventId: allEvents[index]?.id ?? null });
-            } else {
-              const index = Math.min(chapterSlicesList.length - 1, chapterSlicesList.findIndex((s) => s.id === slice.id) + 1);
-              dispatch({ type: 'SELECT_SLICE', sliceId: chapterSlicesList[index]?.id ?? slice.id });
-            }
-          }}
-          onModeChange={(mode) => {
-            dispatch({ type: 'SET_PLAYBACK_MODE', mode });
-            if (mode === 'event' && allEvents.length > 0) {
-              dispatch({ type: 'SET_PLAYBACK_EVENT', eventId: state.playbackEventId ?? allEvents[0].id });
-            }
-          }}
-        />
-        <TimeScrubber
-          slices={chapterSlicesList}
-          activeSliceId={slice.id}
-          playing={state.playing}
-          onSelectSlice={(sliceId) => dispatch({ type: 'SELECT_SLICE', sliceId })}
-          onTogglePlay={() => dispatch({ type: 'TOGGLE_PLAY' })}
-        />
-        <EventCards
-          events={visibleEvents}
-          onSelectEvent={handleSelectEvent}
-        />
+        {!state.letterOpen && (
+          <div className="view-toggle-wrap">
+            <ViewToggle
+              mode={state.viewMode}
+              onChange={(mode) => dispatch({ type: 'SET_VIEW_MODE', mode })}
+            />
+          </div>
+        )}
+        {!state.letterOpen && quizPendingEvent && getQuizPrompt(quizPendingEvent.id) && (
+          <QuizCard
+            prompt={getQuizPrompt(quizPendingEvent.id)!}
+            onAnswer={handleQuizAnswer}
+            onSkip={handleQuizContinue}
+          />
+        )}
+        {!state.letterOpen && (
+          <ChapterRail
+            chapters={chapters}
+            activeChapterId={chapter.id}
+            activeSliceId={slice.id}
+            activeEventId={activeEvent?.id ?? null}
+            slicesByChapter={chapterSlices}
+            events={visibleEvents}
+            onSelectChapter={(chapterId) => dispatch({ type: 'SELECT_CHAPTER', chapterId })}
+            onSelectSlice={(sliceId) => dispatch({ type: 'SELECT_SLICE', sliceId })}
+            onSelectEvent={handleSelectEvent}
+          />
+        )}
+        {!state.letterOpen && (
+          <PlaybackBar
+            mode={state.playbackMode}
+            playing={state.playing}
+            currentEvent={playbackEvent}
+            label={`${chapter.title} · ${slice.label}`}
+            index={state.playbackMode === 'event' ? Math.max(0, playbackIndex) : chapterSlicesList.findIndex((s) => s.id === slice.id)}
+            total={state.playbackMode === 'event' ? allEvents.length : chapterSlicesList.length}
+            onTogglePlay={() => dispatch({ type: 'TOGGLE_PLAY' })}
+            onPrev={() => {
+              if (state.playbackMode === 'event') {
+                const index = Math.max(0, playbackIndex - 1);
+                dispatch({ type: 'SET_PLAYBACK_EVENT', eventId: allEvents[index]?.id ?? null });
+              } else {
+                const index = Math.max(0, chapterSlicesList.findIndex((s) => s.id === slice.id) - 1);
+                dispatch({ type: 'SELECT_SLICE', sliceId: chapterSlicesList[index]?.id ?? slice.id });
+              }
+            }}
+            onNext={() => {
+              if (state.playbackMode === 'event') {
+                const index = Math.min(allEvents.length - 1, playbackIndex + 1);
+                dispatch({ type: 'SET_PLAYBACK_EVENT', eventId: allEvents[index]?.id ?? null });
+              } else {
+                const index = Math.min(chapterSlicesList.length - 1, chapterSlicesList.findIndex((s) => s.id === slice.id) + 1);
+                dispatch({ type: 'SELECT_SLICE', sliceId: chapterSlicesList[index]?.id ?? slice.id });
+              }
+            }}
+            onModeChange={(mode) => {
+              dispatch({ type: 'SET_PLAYBACK_MODE', mode });
+              if (mode === 'event' && allEvents.length > 0) {
+                dispatch({ type: 'SET_PLAYBACK_EVENT', eventId: state.playbackEventId ?? allEvents[0].id });
+              }
+            }}
+            speed={state.playbackSpeed}
+            onSpeedChange={(speed) => dispatch({ type: 'SET_PLAYBACK_SPEED', speed })}
+            quizEnabled={state.quizEnabled}
+            quizScore={state.quizScore}
+            quizAnswered={state.quizAnswered}
+            onToggleQuiz={() => dispatch({ type: 'TOGGLE_QUIZ' })}
+          />
+        )}
+        {!state.letterOpen && (
+          <TimeScrubber
+            slices={chapterSlicesList}
+            activeSliceId={slice.id}
+            events={visibleEvents}
+            chapter={chapter}
+            activeEventId={activeEvent?.id ?? null}
+            playing={state.playing}
+            onSelectSlice={(sliceId) => dispatch({ type: 'SELECT_SLICE', sliceId })}
+            onTogglePlay={() => dispatch({ type: 'TOGGLE_PLAY' })}
+            onSelectEvent={handleSelectEvent}
+          />
+        )}
+        {!state.letterOpen && (
+          <EventCards
+            events={visibleEvents}
+            onSelectEvent={handleSelectEvent}
+          />
+        )}
         <InfoDrawer
           open={state.drawerOpen}
           polity={selectedPolity}
           event={selectedEvent}
           onClose={() => dispatch({ type: 'CLOSE_DRAWER' })}
         />
+        {state.letterOpen && (
+          <LetterView
+            intentId={state.letterIntentId}
+            specId={state.letterId}
+            objects={letterObjects}
+            focusedEventId={state.letterFocusedEventId}
+            onPickIntent={handlePickIntent}
+            onFocusEvent={handleFocusLetterEvent}
+            onClose={() => dispatch({ type: 'CLOSE_LETTERS' })}
+          />
+        )}
         {aboutOpen && (
           <div className="about-overlay" role="dialog" aria-label="说明">
             <div className="about-panel">

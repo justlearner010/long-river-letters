@@ -1,3 +1,5 @@
+import type { CausalLink } from './data/causalLinks';
+
 export type Region =
   | '东亚' | '东南亚' | '南亚' | '西亚' | '中亚' | '欧洲'
   | '北非' | '撒哈拉以南非洲' | '北美' | '拉美' | '大洋洲' | '全球';
@@ -52,6 +54,8 @@ export interface WorldEvent {
   regimeChange?: string;
   links?: GlobalLink[];
   flows?: GlobalLink[];
+  upstream?: CausalLink[];
+  downstream?: CausalLink[];
   category: EventCategory;
   regions: Region[];
   polityIds: string[];

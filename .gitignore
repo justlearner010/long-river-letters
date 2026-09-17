@@ -6,3 +6,17 @@ dist/
 *.tsbuildinfo
 test-results/
 playwright-report/
+
+# Compressed artifact models. These are one-off Tripo3D generations (960 credits),
+# not reproducible from any pipeline — a clone must be runnable, so they are tracked.
+# The uncompressed originals in models-src/ stay ignored (see below).
+# public/vendor/ is also ignored: it is a re-fetchable third-party bundle.
+
+# Uncompressed Tripo exports; keep locally for re-compression, do not commit
+models-src/
+
+# Vendored third-party bundle, re-fetched by the build; never hand-edited.
+public/vendor/
+
+# Sibling project with its own node_modules/dist; not part of this repo.
+china-history-atlas/

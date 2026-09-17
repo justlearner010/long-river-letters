@@ -68,6 +68,26 @@ export default function InfoDrawer({ open, polity, event, onClose }: InfoDrawerP
           <p>{event.regimeChange}</p>
         </section>
       )}
+      {event && (event.upstream?.length ?? 0) > 0 && (
+        <section className="drawer-section">
+          <h3>前因</h3>
+          <ul className="causal-list">
+            {event.upstream!.map((link, index) => (
+              <li key={`up-${index}`}>{link.description}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {event && (event.downstream?.length ?? 0) > 0 && (
+        <section className="drawer-section">
+          <h3>后果</h3>
+          <ul className="causal-list">
+            {event.downstream!.map((link, index) => (
+              <li key={`down-${index}`}>{link.description}</li>
+            ))}
+          </ul>
+        </section>
+      )}
     </aside>
   );
 }

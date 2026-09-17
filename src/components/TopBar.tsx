@@ -20,6 +20,7 @@ interface TopBarProps {
   onFilter: (category: string) => void;
   onRegion: (region: string) => void;
   onOpenAbout: () => void;
+  onOpenLetters: () => void;
 }
 
 export default function TopBar({
@@ -32,6 +33,7 @@ export default function TopBar({
   onFilter,
   onRegion,
   onOpenAbout,
+  onOpenLetters,
 }: TopBarProps) {
   return (
     <header className="topbar">
@@ -78,6 +80,7 @@ export default function TopBar({
           <option value="全球">全球</option>
         </select>
       </label>
+      <button type="button" className="letters-button" onClick={onOpenLetters}>来信</button>
       <button type="button" className="about-button" onClick={onOpenAbout}>说明</button>
       <span className="year-badge">{year}</span>
     </header>
