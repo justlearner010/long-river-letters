@@ -74,7 +74,7 @@ export const letterSpecs: LetterSpec[] = [
     figureId: 'fig-weltsch',
     eventId: 'e170',
     recipient: '送给觉得战争随时会烧到自己门口的人',
-    causalPath: ['e170', 'e188', 'e190', 'e191'],
+    causalPath: ['e170', 'e187', 'e188', 'e190', 'e191'],
   },
   {
     id: 'lib-war-gallipoli-1915',
@@ -90,7 +90,7 @@ export const letterSpecs: LetterSpec[] = [
     figureId: 'fig-barbusse',
     eventId: 'e172',
     recipient: '送给觉得伤亡数字太大就无法感受的人',
-    causalPath: ['e172', 'e170', 'e187', 'e188', 'e190'],
+    causalPath: ['e172', 'e178', 'e184', 'e187', 'e188'],
   },
   {
     id: 'lib-war-somme-nco',
@@ -98,7 +98,7 @@ export const letterSpecs: LetterSpec[] = [
     figureId: 'fig-trench-nco',
     eventId: 'e172',
     recipient: '送给觉得自己只是一个统计数字的人',
-    causalPath: ['e172', 'e170', 'e187', 'e188', 'e190'],
+    causalPath: ['e172', 'e178', 'e184', 'e187', 'e188'],
   },
   {
     id: 'lib-war-barbarossa',
@@ -130,7 +130,7 @@ export const letterSpecs: LetterSpec[] = [
     figureId: 'fig-berlin-loader',
     eventId: 'e199',
     recipient: '送给被围住却还要照常过日子的人',
-    causalPath: ['e199', 'e198'],
+    causalPath: ['e198', 'e199'],
   },
   {
     id: 'lib-trade-tariff-war',
@@ -138,7 +138,7 @@ export const letterSpecs: LetterSpec[] = [
     figureId: 'fig-prd-buyer',
     eventId: 'e222',
     recipient: '送给每天在重新安排供应链的人',
-    causalPath: ['e222', 'e213', 'e209', 'e208'],
+    causalPath: ['e208', 'e209', 'e213', 'e222'],
   },
   {
     id: 'lib-plague-messina',
@@ -154,7 +154,7 @@ export const letterSpecs: LetterSpec[] = [
     figureId: 'fig-florence-notary',
     eventId: 'e103',
     recipient: '送给失去亲人却来不及悲伤的人',
-    causalPath: ['e103', 'e138'],
+    causalPath: ['e103'],
   },
   {
     id: 'lib-plague-wuhan',
@@ -162,7 +162,7 @@ export const letterSpecs: LetterSpec[] = [
     figureId: 'fig-wuhan-community',
     eventId: 'e223',
     recipient: '送给被困在一座城里的人',
-    causalPath: ['e223', 'e222'],
+    causalPath: ['e223', 'e226'],
   },
   {
     id: 'lib-plague-bergamo',
@@ -170,7 +170,7 @@ export const letterSpecs: LetterSpec[] = [
     figureId: 'fig-bergamo-journalist',
     eventId: 'e223',
     recipient: '送给每天盯着数字看的人',
-    causalPath: ['e223', 'e222'],
+    causalPath: ['e223', 'e226'],
   },
   {
     id: 'lib-plague-yiwu',
@@ -178,7 +178,7 @@ export const letterSpecs: LetterSpec[] = [
     figureId: 'fig-yiwu-seller',
     eventId: 'e223',
     recipient: '送给生意一夜之间换了规则的人',
-    causalPath: ['e223', 'e222'],
+    causalPath: ['e223', 'e226'],
   },
   {
     id: 'lib-tech-print-erasmus',
@@ -202,7 +202,7 @@ export const letterSpecs: LetterSpec[] = [
     figureId: 'fig-agc-programmer',
     eventId: 'e205',
     recipient: '送给在做一件没人相信能做成的事的人',
-    causalPath: ['e205', 'e204'],
+    causalPath: ['e204', 'e205'],
   },
   {
     id: 'lib-tech-apollo-control',
@@ -210,7 +210,7 @@ export const letterSpecs: LetterSpec[] = [
     figureId: 'fig-houston-controller',
     eventId: 'e205',
     recipient: '送给把全部把握押在一次尝试上的人',
-    causalPath: ['e205', 'e204'],
+    causalPath: ['e204', 'e205'],
   },
 ];
 

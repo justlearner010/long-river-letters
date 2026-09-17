@@ -12,9 +12,19 @@ import { buildFactPack } from '../scripts/generate-letters';
 
 const GENERATED_PATH = resolve(dirname(fileURLToPath(import.meta.url)), '../src/data/letters.generated.json');
 const hasGenerated = existsSync(GENERATED_PATH);
-const generated: Letter[] = hasGenerated
-  ? (JSON.parse(readFileSync(GENERATED_PATH, 'utf8')) as Letter[])
-  : [];
+/**
+ * The JSON holds prose only; intent, figure, anchor event and causal path all
+ * live in `letterSpecs`. Join them here so the assertions below still check the
+ * full shape -- and so a spec edit can never silently diverge from the prose.
+ */
+const proseById = new Map<string, Partial<Letter>>(
+  hasGenerated
+    ? (JSON.parse(readFileSync(GENERATED_PATH, 'utf8')) as Partial<Letter>[]).map((p) => [p.id!, p])
+    : [],
+);
+const generated: Letter[] = letterSpecs
+  .filter((spec) => proseById.has(spec.id))
+  .map((spec) => ({ ...spec, ...proseById.get(spec.id)! }) as Letter);
 
 const eventIds = new Set(events.map((event) => event.id));
 const figureIds = new Set(figures.map((figure) => figure.id));

@@ -37,23 +37,29 @@ export function formatYear(year: number): string {
 
 /**
  * Generated prose is committed as JSON but may legitimately not exist yet.
- * A missing glob is resolved eagerly at build time, so the loader is written
- * defensively: absent file means "no prose", never a build or render failure.
+ * A missing glob resolves eagerly at build time, so the loader is defensive:
+ * absent file means "no prose", never a build or render failure. The file is an
+ * array of entries keyed by the same ids as `letterSpecs`.
  */
 const proseModules = import.meta.glob('../data/letters.generated.json', { eager: true }) as Record<
   string,
-  { default?: Record<string, Partial<Letter>> }
+  { default?: Partial<Letter>[] }
 >;
 
-const proseCache: Record<string, Partial<Letter>> = (() => {
-  for (const mod of Object.values(proseModules)) {
-    const data = mod.default ?? (mod as unknown as Record<string, Partial<Letter>>);
-    if (data && typeof data === 'object') return data;
+/**
+ * The JSON holds prose only. Everything structural -- intent, figure, anchor,
+ * causal path -- comes from `letterSpecs`, so the two cannot drift apart.
+ */
+const proseCache = new Map<string, Partial<Letter>>();
+for (const mod of Object.values(proseModules)) {
+  const entries = mod.default;
+  if (!Array.isArray(entries)) continue;
+  for (const entry of entries) {
+    if (entry?.id) proseCache.set(entry.id, entry);
   }
-  return {};
-})();
+}
 
-function useGeneratedProse(): Record<string, Partial<Letter>> {
+function useGeneratedProse(): Map<string, Partial<Letter>> {
   return proseCache;
 }
 
@@ -137,7 +143,7 @@ export default function LetterView({
     );
   }
 
-  const letter = prose[spec.id];
+  const letter = prose.get(spec.id);
   const causalPath = spec.causalPath
     .map((id) => getEnrichedEvent(id))
     .filter((event): event is WorldEvent => event !== null);

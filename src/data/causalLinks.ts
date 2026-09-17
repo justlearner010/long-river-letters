@@ -36,6 +36,13 @@ export const causalLinks: CausalLink[] = [
   { fromEventId: 'e213', toEventId: 'e222', relation: 'contributes', description: '中国深度融入全球经济后，与美国的结构性竞争演变为贸易战。' },
   { fromEventId: 'e219', toEventId: 'e224', relation: 'contributes', description: '2014 年克里米亚危机后俄西关系持续恶化，2022 年俄乌战争全面爆发。' },
   { fromEventId: 'e222', toEventId: 'e226', relation: 'contributes', description: '中美竞争与多组区域力量崛起，使世界向多极格局演化。' },
+  { fromEventId: 'e191', toEventId: 'e194', relation: 'direct', description: '斯大林格勒与中途岛的转折使同盟国掌握主动，为 1945 年雅尔塔的战后安排奠定基础。' },
+  { fromEventId: 'e204', toEventId: 'e205', relation: 'contributes', description: '古巴导弹危机把冷战对抗推到核战边缘，加速了美苏在太空领域的声望竞赛。' },
+  { fromEventId: 'e223', toEventId: 'e226', relation: 'contributes', description: '疫情暴露全球供应链的脆弱与治理分歧，加速了多极格局的成型。' },
+  { fromEventId: 'e170', toEventId: 'e187', relation: 'contributes', description: '一战未解决的领土与赔偿问题埋下更深的怨恨，二十年后慕尼黑协定成为又一次失败的绥靖。' },
+  { fromEventId: 'e188', toEventId: 'e190', relation: 'trigger', description: '德苏条约划分了东欧势力范围，使德国敢于在 1941 年同时开辟对苏战场。' },
+  { fromEventId: 'e172', toEventId: 'e178', relation: 'contributes', description: '凡尔登与索姆河的惨重消耗彻底改变了战胜国对德国的处置意愿，凡尔赛和约由此走向严苛。' },
+  { fromEventId: 'e184', toEventId: 'e187', relation: 'enables', description: '纳粹上台后德国重新武装并公开挑战凡尔赛体系，慕尼黑协定正是这一扩张压力下的产物。' },
 ];
 
 export function buildCausalIndex(events: WorldEvent[], links: CausalLink[]) {
