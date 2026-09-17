@@ -43,14 +43,13 @@ describe('appReducer', () => {
     expect(next.letterFocusedEventId).toBeNull();
   });
 
-  it('closes letters without touching the map frame', () => {
+  it('returns to the ask when restarting', () => {
     const open = appReducer(
-      { ...initialAppState, letterOpen: true, letterId: 'l001', letterIntentId: 'war' },
-      { type: 'CLOSE_LETTERS' },
+      { ...initialAppState, letterId: 'l1', letterIntentId: 'war' },
+      { type: 'OPEN_LETTERS' },
     );
-    expect(open.letterOpen).toBe(false);
     expect(open.letterId).toBeNull();
+    expect(open.letterIntentId).toBeNull();
     expect(open.chapterId).toBe(initialAppState.chapterId);
-    expect(open.sliceId).toBe(initialAppState.sliceId);
   });
 });

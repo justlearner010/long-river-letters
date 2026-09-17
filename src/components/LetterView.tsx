@@ -27,7 +27,8 @@ interface LetterViewProps {
   onFocusEvent: (eventId: string | null) => void;
   /** Fired once the letter has finished revealing, so the map can play backward. */
   onDescend: (eventId: string) => void;
-  onClose: () => void;
+  /** Return to the ask so another concern can be chosen. */
+  onRestart: () => void;
 }
 
 export function formatYear(year: number): string {
@@ -64,7 +65,7 @@ export default function LetterView({
   onPickIntent,
   onFocusEvent,
   onDescend,
-  onClose,
+  onRestart,
 }: LetterViewProps) {
   const prose = useGeneratedProse();
   const [settled, setSettled] = useState(false);
@@ -86,7 +87,7 @@ export default function LetterView({
   }, [settled, anchorId, onDescend]);
 
   if (!intentId) {
-    return <ConcernPicker intents={availableIntents()} onPick={onPickIntent} onClose={onClose} />;
+    return <ConcernPicker intents={availableIntents()} onPick={onPickIntent} />;
   }
 
   const intent = getLetterIntent(intentId);
@@ -111,8 +112,8 @@ export default function LetterView({
             <strong>{intent.label}</strong>　·　{intent.prompt}
           </span>
           <div className="letter-head-actions">
-            <button type="button" className="letter-action" onClick={onClose}>
-              返回地图
+            <button type="button" className="letter-action" onClick={onRestart}>
+              换一个
             </button>
           </div>
         </header>
@@ -149,8 +150,8 @@ export default function LetterView({
           <strong>{figure.eraLabel}</strong>　·　{formatYear(anchorEvent.year)} 年
         </span>
         <div className="letter-head-actions">
-          <button type="button" className="letter-action" onClick={onClose}>
-            返回地图
+          <button type="button" className="letter-action" onClick={onRestart}>
+            换一个
           </button>
         </div>
       </header>

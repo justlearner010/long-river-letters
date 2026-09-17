@@ -31,7 +31,6 @@ export type AppAction =
   | { type: 'CLOSE_DRAWER' }
   | { type: 'RESTORE'; state: Partial<AppState> }
   | { type: 'OPEN_LETTERS' }
-  | { type: 'CLOSE_LETTERS' }
   | { type: 'SELECT_LETTER_INTENT'; intentId: string }
   | { type: 'SET_LETTER'; letterId: string }
   | { type: 'FOCUS_LETTER_EVENT'; eventId: string | null };
@@ -45,7 +44,8 @@ export const initialAppState: AppState = {
   selectedPolityId: null,
   selectedEventId: null,
   drawerOpen: false,
-  letterOpen: false,
+  // The letter is the landing page, so it starts open.
+  letterOpen: true,
   letterIntentId: null,
   letterId: null,
   letterFocusedEventId: null,
@@ -82,16 +82,6 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         letterId: null,
         letterFocusedEventId: null,
         drawerOpen: false,
-        selectedEventId: null,
-        selectedPolityId: null,
-      };
-    case 'CLOSE_LETTERS':
-      return {
-        ...state,
-        letterOpen: false,
-        letterIntentId: null,
-        letterId: null,
-        letterFocusedEventId: null,
         selectedEventId: null,
         selectedPolityId: null,
       };

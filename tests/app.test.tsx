@@ -5,10 +5,13 @@ import App from '../src/App';
 import WorldMap from '../src/components/WorldMap';
 
 describe('App', () => {
-  it('renders the top bar and map stage', () => {
+  it('opens on the ask rather than on the map', () => {
     render(<App />);
-    expect(screen.getByRole('heading', { name: '世界格局变化' })).toBeInTheDocument();
-    expect(screen.getByTestId('world-map')).toBeInTheDocument();
+    expect(screen.getByText(/在担心什么/)).toBeInTheDocument();
+    // The four concerns are the only choice presented.
+    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(
+      expect.arrayContaining(['战争', '瘟疫', '贸易封锁', '技术冲击']),
+    );
   });
 
   it('renders a map svg even without attribution data', () => {
@@ -25,9 +28,11 @@ describe('App', () => {
     expect(screen.getByTestId('world-map')).toBeInTheDocument();
   });
 
-  it('opens the letter flow from the top bar', async () => {
+  it('moves from the ask to a letter', async () => {
     render(<App />);
-    await userEvent.click(screen.getByRole('button', { name: '来信' }));
-    expect(await screen.findByText(/在担心什么/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: '战争' }));
+    // The ask is gone and the reader is now in the letter flow.
+    expect(screen.queryByText(/在担心什么/)).not.toBeInTheDocument();
+    expect(await screen.findByText(/本信基于以下已记录史实/)).toBeInTheDocument();
   });
 });

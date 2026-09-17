@@ -95,19 +95,15 @@ export default function App() {
 
   return (
     <main className="app-shell">
-      <TopBar
-        year={slice.year}
-        chapterTitle={`${chapter.title} · ${slice.label}`}
-        search={state.search}
-        filter={state.category}
-        region={state.region}
-        onSearch={(search) => dispatch({ type: 'SET_SEARCH', search })}
-        onFilter={(category) => dispatch({ type: 'SET_CATEGORY', category: category as typeof state.category })}
-        onRegion={(region) => dispatch({ type: 'SET_REGION', region: region as typeof state.region })}
-        onOpenAbout={() => setAboutOpen(true)}
-        onOpenLetters={() => dispatch({ type: 'OPEN_LETTERS' })}
-      />
+      {!state.letterOpen && (
+        <TopBar
+          year={slice.year}
+          chapterTitle={`${chapter.title} · ${slice.label}`}
+          onOpenAbout={() => setAboutOpen(true)}
+        />
+      )}
       <section className="map-stage">
+        {state.letterOpen && (
         <WorldMap
           frame={frame}
           highlightIds={highlightIds}
@@ -117,6 +113,7 @@ export default function App() {
           focusLon={focusLon}
           onSelectPolity={(polityId) => dispatch({ type: 'SELECT_POLITY', polityId })}
         />
+        )}
 
         {(selectedEvent || state.selectedPolityId) && !state.letterOpen && (
           <div className="map-caption" aria-live="polite">
@@ -141,7 +138,7 @@ export default function App() {
             onPickIntent={handlePickIntent}
             onFocusEvent={handleFocusLetterEvent}
             onDescend={handleDescend}
-            onClose={() => dispatch({ type: 'CLOSE_LETTERS' })}
+            onRestart={() => dispatch({ type: 'OPEN_LETTERS' })}
           />
         )}
 
