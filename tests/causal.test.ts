@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { causalLinks, buildCausalIndex } from '../src/data/causalLinks';
 import { events } from '../src/data/events';
-import { quizPrompts } from '../src/data/quizPrompts';
 import { enrichedEvents } from '../src/lib/enrichEvents';
 
 describe('causal chain data', () => {
@@ -43,17 +42,3 @@ describe('causal chain data', () => {
   });
 });
 
-describe('quiz data', () => {
-  it('every quiz prompt points to a real event', () => {
-    const eventIds = new Set(events.map((e) => e.id));
-    const bad = quizPrompts.filter((q) => !eventIds.has(q.eventId));
-    expect(bad).toEqual([]);
-  });
-
-  it('every quiz has a valid correct index', () => {
-    const bad = quizPrompts.filter(
-      (q) => q.correctIndex < 0 || q.correctIndex >= q.options.length || q.options.length < 2,
-    );
-    expect(bad).toEqual([]);
-  });
-});

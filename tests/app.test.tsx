@@ -25,9 +25,9 @@ describe('App', () => {
     expect(screen.getByTestId('world-map')).toBeInTheDocument();
   });
 
-  it('switches chapters and shows a new slice', async () => {
+  it('opens the letter flow from the top bar', async () => {
     render(<App />);
-    await userEvent.click(screen.getByRole('button', { name: /1500 征服与全球连接/ }));
-    expect(screen.getAllByText(/全球帝国初现/).length).toBeGreaterThan(0);
+    await userEvent.click(screen.getByRole('button', { name: '来信' }));
+    expect(await screen.findByText(/在担心什么/)).toBeInTheDocument();
   });
 });
