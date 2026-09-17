@@ -27,6 +27,19 @@ export interface Letter extends LetterProse {
   model?: string;
 }
 
+/**
+ * Every letter in the shipped corpus is authored, reviewed, and anchored to a
+ * recorded event. That is what makes the "not a chatbot" claim hold, so the
+ * provenance is explicit rather than implied.
+ *
+ * `'visitor'` is reserved for the unbuilt return-letter feature: a reader's own
+ * reply, attached to the same map. Those entries must never be mixed into the
+ * curated set -- they are unverified by construction, and the credibility of the
+ * whole thing rests on the curated layer staying verifiable. When that feature
+ * lands it should read from its own store, not from `letterSpecs`.
+ */
+export type LetterProvenance = 'curated' | 'visitor';
+
 export interface LetterSpec {
   id: string;
   intentId: string;
@@ -34,6 +47,7 @@ export interface LetterSpec {
   eventId: string;
   recipient: string;
   causalPath: string[];
+  provenance: LetterProvenance;
 }
 
 export const letterIntents: LetterIntent[] = [
@@ -75,6 +89,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e170',
     recipient: '送给觉得战争随时会烧到自己门口的人',
     causalPath: ['e170', 'e187', 'e188', 'e190', 'e191'],
+    provenance: 'curated',
   },
   {
     id: 'lib-war-gallipoli-1915',
@@ -83,6 +98,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e171',
     recipient: '送给以为一场战役很快就会结束的人',
     causalPath: ['e171'],
+    provenance: 'curated',
   },
   {
     id: 'lib-war-somme-writer',
@@ -91,6 +107,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e172',
     recipient: '送给觉得伤亡数字太大就无法感受的人',
     causalPath: ['e172', 'e178', 'e184', 'e187', 'e188'],
+    provenance: 'curated',
   },
   {
     id: 'lib-war-somme-nco',
@@ -99,6 +116,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e172',
     recipient: '送给觉得自己只是一个统计数字的人',
     causalPath: ['e172', 'e178', 'e184', 'e187', 'e188'],
+    provenance: 'curated',
   },
   {
     id: 'lib-war-barbarossa',
@@ -107,6 +125,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e190',
     recipient: '送给在坏消息里强撑着过日子的人',
     causalPath: ['e190', 'e191', 'e194', 'e197', 'e201'],
+    provenance: 'curated',
   },
   {
     id: 'lib-trade-dutch-wars',
@@ -115,6 +134,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e135',
     recipient: '送给靠一条海路吃饭的人',
     causalPath: ['e135'],
+    provenance: 'curated',
   },
   {
     id: 'lib-trade-continental-system',
@@ -123,6 +143,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e149',
     recipient: '送给忽然发现生意做不下去的人',
     causalPath: ['e149', 'e150'],
+    provenance: 'curated',
   },
   {
     id: 'lib-trade-berlin-airlift',
@@ -131,6 +152,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e199',
     recipient: '送给被围住却还要照常过日子的人',
     causalPath: ['e198', 'e199'],
+    provenance: 'curated',
   },
   {
     id: 'lib-trade-tariff-war',
@@ -139,6 +161,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e222',
     recipient: '送给每天在重新安排供应链的人',
     causalPath: ['e208', 'e209', 'e213', 'e222'],
+    provenance: 'curated',
   },
   {
     id: 'lib-plague-messina',
@@ -147,6 +170,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e103',
     recipient: '送给觉得灾难来得毫无道理的人',
     causalPath: ['e103'],
+    provenance: 'curated',
   },
   {
     id: 'lib-plague-florence',
@@ -155,6 +179,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e103',
     recipient: '送给失去亲人却来不及悲伤的人',
     causalPath: ['e103'],
+    provenance: 'curated',
   },
   {
     id: 'lib-plague-wuhan',
@@ -163,6 +188,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e223',
     recipient: '送给被困在一座城里的人',
     causalPath: ['e223', 'e226'],
+    provenance: 'curated',
   },
   {
     id: 'lib-plague-bergamo',
@@ -171,6 +197,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e223',
     recipient: '送给每天盯着数字看的人',
     causalPath: ['e223', 'e226'],
+    provenance: 'curated',
   },
   {
     id: 'lib-plague-yiwu',
@@ -179,6 +206,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e223',
     recipient: '送给生意一夜之间换了规则的人',
     causalPath: ['e223', 'e226'],
+    provenance: 'curated',
   },
   {
     id: 'lib-tech-print-erasmus',
@@ -187,6 +215,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e113',
     recipient: '送给觉得信息太多、判断太难的人',
     causalPath: ['e113', 'e121'],
+    provenance: 'curated',
   },
   {
     id: 'lib-tech-print-compositor',
@@ -195,6 +224,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e113',
     recipient: '送给靠手艺吃饭、却看见机器替代自己的人',
     causalPath: ['e113', 'e121'],
+    provenance: 'curated',
   },
   {
     id: 'lib-tech-apollo-programmer',
@@ -203,6 +233,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e205',
     recipient: '送给在做一件没人相信能做成的事的人',
     causalPath: ['e204', 'e205'],
+    provenance: 'curated',
   },
   {
     id: 'lib-tech-apollo-control',
@@ -211,6 +242,7 @@ export const letterSpecs: LetterSpec[] = [
     eventId: 'e205',
     recipient: '送给把全部把握押在一次尝试上的人',
     causalPath: ['e204', 'e205'],
+    provenance: 'curated',
   },
 ];
 
