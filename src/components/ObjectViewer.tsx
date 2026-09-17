@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 
-const MODEL_VIEWER_SRC = '/vendor/model-viewer.min.js';
+// Must respect the deploy base: project pages are served from /<repo>/, so a
+// leading-slash path would resolve against the domain root and 404.
+const MODEL_VIEWER_SRC = `${import.meta.env.BASE_URL}vendor/model-viewer.min.js`;
 
 interface ObjectViewerProps {
   src: string;

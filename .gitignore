@@ -15,8 +15,9 @@ playwright-report/
 # Uncompressed Tripo exports; keep locally for re-compression, do not commit
 models-src/
 
-# Vendored third-party bundle, re-fetched by the build; never hand-edited.
-public/vendor/
+# Vendored model-viewer bundle (BSD-3-Clause, Google LLC). Committed on purpose:
+# the app must stay offline-capable, so it cannot fetch this from a CDN at runtime.
+public/vendor/*.map
 
 # Sibling project with its own node_modules/dist; not part of this repo.
 china-history-atlas/
