@@ -138,7 +138,7 @@ body {
 .playback-progress { display: flex; align-items: center; gap: 6px; flex: none; font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
 .progress-track { width: 120px; height: 5px; border-radius: 3px; background: var(--paper-deep); overflow: hidden; }
 .progress-fill { height: 100%; background: var(--gold); }
-.info-drawer { position: absolute; top: 14px; right: 14px; bottom: 14px; width: min(330px, 34vw); background: rgba(250,242,220,.97); border: 1px solid var(--ink-soft); border-radius: 6px; padding: 18px; box-shadow: 0 6px 24px rgba(60,40,20,.22); z-index: 6; overflow-y: auto; }
+.info-drawer { position: absolute; top: 14px; right: 14px; bottom: 14px; width: min(330px, 34vw); background: rgba(250,242,220,.97); border: 1px solid var(--ink-soft); border-radius: 6px; padding: 18px; box-shadow: 0 6px 24px rgba(60,40,20,.22); z-index: 9; overflow-y: auto; }
 .info-drawer h2 { margin-top: 0; }
 .drawer-sub { color: var(--ink-soft); font-size: 13px; }
 .drawer-summary { line-height: 1.7; }
@@ -302,7 +302,48 @@ body {
   padding: 16px 22px 14px;
   background: linear-gradient(160deg, rgba(240,228,199,.97), rgba(217,201,166,.97));
   animation: letterIn .5s cubic-bezier(.2,.8,.2,1) both;
+  transition: left .8s cubic-bezier(.2,.8,.2,1), right .8s cubic-bezier(.2,.8,.2,1);
 }
+
+/* Act 3: once the letter has settled it withdraws to the left and lets the globe
+   take the right, which is where the map plays back to the anchor year. */
+.letter-overlay.settled {
+  right: 58%;
+  background: linear-gradient(90deg, rgba(240,228,199,.97) 82%, rgba(240,228,199,0));
+  pointer-events: none;
+}
+.letter-overlay.settled .letter-paper,
+.letter-overlay.settled .letter-head,
+.letter-overlay.settled .letter-causal,
+.letter-overlay.settled .letter-aside { pointer-events: auto; }
+
+/* The panel is now narrow, so the paper hugs its left edge instead of floating
+   in the middle, and the aside stacks beneath it rather than sitting beside. */
+.letter-overlay.settled {
+  grid-template-columns: 1fr;
+  align-content: start;
+}
+.letter-overlay.settled .letter-paper {
+  justify-self: stretch;
+  width: auto;
+  margin-top: 12px;
+  padding: 26px 30px 30px;
+}
+.letter-overlay.settled .letter-aside {
+  grid-column: 1;
+  grid-row: 3;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+.letter-overlay.settled .letter-object { width: 96px; flex: none; }
+.letter-overlay.settled .letter-causal {
+  grid-column: 1;
+  grid-row: 4;
+  flex-wrap: wrap;
+}
+.letter-overlay.settled .letter-head { grid-column: 1; }
 @keyframes letterIn {
   from { opacity: 0; transform: scale(.98); }
   to { opacity: 1; transform: scale(1); }

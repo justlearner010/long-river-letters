@@ -15,6 +15,8 @@ interface WorldMapProps {
   links: GlobalLink[];
   flows: GlobalLink[];
   resetKey: string;
+  /** Centre longitude to swing to, in degrees east. Null means keep spinning. */
+  focusLon?: number | null;
   onSelectPolity: (polityId: string, countryName: string) => void;
 }
 
@@ -37,7 +39,7 @@ function setPath(node: SvgPath | null, d: string | null) {
   if (node) node.setAttribute('d', d ?? '');
 }
 
-export default function WorldMap({ frame, highlightIds, links, flows, resetKey, onSelectPolity }: WorldMapProps) {
+export default function WorldMap({ frame, highlightIds, links, flows, resetKey, focusLon, onSelectPolity }: WorldMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 900, height: 560 });
@@ -46,6 +48,9 @@ export default function WorldMap({ frame, highlightIds, links, flows, resetKey, 
 
   /** Centre longitude, in degrees. Mutated by the rAF loop; never triggers a React render. */
   const rotationRef = useRef(INITIAL_CENTER_LON);
+  /** While a letter is open the globe holds still on the anchor hemisphere. */
+  const focusRef = useRef<number | null>(null);
+  focusRef.current = focusLon ?? null;
 
   // Keep the latest data reachable from the (long-lived) animation loop without re-creating it.
   const dataRef = useRef({ countries, links, flows });
@@ -77,6 +82,18 @@ export default function WorldMap({ frame, highlightIds, links, flows, resetKey, 
 
   const { projection, path, radius } = globe;
   const [centerX, centerY] = projection.translate();
+
+  /**
+   * Swing the globe to the requested hemisphere. This runs in both motion modes:
+   * with reduced-motion the rAF loop never starts, so the repaint must happen here.
+   */
+  useEffect(() => {
+    // undefined and null both mean "no focus": tests and other callers omit it.
+    if (focusLon === null || focusLon === undefined) return;
+    rotationRef.current = ((focusLon % 360) + 360) % 360;
+    applyRotation(projection, rotationRef.current);
+    paintRef.current?.();
+  }, [focusLon, projection]);
 
   const spherePath = useMemo(() => path({ type: 'Sphere' } as never) ?? '', [path]);
   const graticulePath = useMemo(() => path(GRATICULE() as never) ?? '', [path]);
@@ -202,7 +219,9 @@ export default function WorldMap({ frame, highlightIds, links, flows, resetKey, 
       const delta = previous === 0 ? 0 : timestamp - previous;
       previous = timestamp;
       // Timestamp delta (not frame count) keeps the speed identical across refresh rates.
-      rotationRef.current = (rotationRef.current + (360 * delta) / REVOLUTION_MS) % 360;
+      if (focusRef.current === null) {
+        rotationRef.current = (rotationRef.current + (360 * delta) / REVOLUTION_MS) % 360;
+      }
       sinceLastPaint += delta;
       if (sinceLastPaint >= PAINT_INTERVAL_MS) {
         sinceLastPaint = 0;

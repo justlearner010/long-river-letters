@@ -25,6 +25,8 @@ interface LetterViewProps {
   focusedEventId: string | null;
   onPickIntent: (intentId: string) => void;
   onFocusEvent: (eventId: string | null) => void;
+  /** Fired once the letter has finished revealing, so the map can play backward. */
+  onDescend: (eventId: string) => void;
   onClose: () => void;
 }
 
@@ -61,9 +63,27 @@ export default function LetterView({
   focusedEventId,
   onPickIntent,
   onFocusEvent,
+  onDescend,
   onClose,
 }: LetterViewProps) {
   const prose = useGeneratedProse();
+  const [settled, setSettled] = useState(false);
+
+  // The letter reveals over ~3s; only then does the map move, so the reader is
+  // looking at the letter rather than an animation behind it.
+  const anchorId = specId ? getLetterSpec(specId)?.eventId ?? null : null;
+  useEffect(() => {
+    if (!anchorId) {
+      setSettled(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setSettled(true), 3000);
+    return () => window.clearTimeout(timer);
+  }, [anchorId]);
+
+  useEffect(() => {
+    if (settled && anchorId) onDescend(anchorId);
+  }, [settled, anchorId, onDescend]);
 
   if (!intentId) {
     return <ConcernPicker intents={availableIntents()} onPick={onPickIntent} onClose={onClose} />;
@@ -123,7 +143,7 @@ export default function LetterView({
   const attachment = objects[spec.id] ?? (firstSpec ? objects[firstSpec.id] : undefined);
 
   return (
-    <div className="letter-overlay" role="dialog" aria-label="来信">
+    <div className={`letter-overlay${settled ? ' settled' : ''}`} role="dialog" aria-label="来信">
       <header className="letter-head">
         <span className="letter-where">
           <strong>{figure.eraLabel}</strong>　·　{formatYear(anchorEvent.year)} 年

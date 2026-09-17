@@ -7,6 +7,7 @@ import { enrichedEvents as events, getEnrichedEvent } from './lib/enrichEvents';
 import { loadCountries } from './lib/world';
 import { buildAttributionFrame } from './lib/attribution';
 import { filterEvents } from './lib/filter';
+import { locationForPolities } from './lib/eventLocation';
 import { saveState, loadState } from './lib/storage';
 import { appReducer, chapterSlices, initialAppState } from './state/appReducer';
 import type { GlobalLink, WorldEvent } from './types';
@@ -70,9 +71,13 @@ export default function App() {
       : state.playbackMode === 'event' && state.playbackEventId
         ? playbackEvent
         : null;
+  /**
+   * Order matters: SET_PLAYBACK_EVENT closes the drawer, so it must run before
+   * SELECT_EVENT or it immediately undoes the drawer the click just opened.
+   */
   const handleSelectEvent = useCallback((eventId: string) => {
-    dispatch({ type: 'SELECT_EVENT', eventId });
     dispatch({ type: 'SET_PLAYBACK_EVENT', eventId });
+    dispatch({ type: 'SELECT_EVENT', eventId });
   }, []);
 
   useEffect(() => {
@@ -187,6 +192,35 @@ export default function App() {
     if (eventId) handleSelectEvent(eventId);
   }, [handleSelectEvent]);
 
+  /**
+   * Act 3: the letter has been read, so the map plays backward to the anchor year.
+   * This is a deliberate single jump rather than a sweep — replaying 700 years of
+   * slices would take a minute and nobody would watch it behind a letter.
+   */
+  /**
+   * The globe must face the anchor's hemisphere, not just show the right year.
+   * Derived from the anchor event's polities rather than stored per event.
+   */
+  const focusLon = useMemo(() => {
+    if (!state.letterOpen || !state.letterId) return null;
+    const spec = letterSpecs.find((candidate) => candidate.id === state.letterId);
+    const anchor = spec ? getEnrichedEvent(spec.eventId) : null;
+    return anchor ? locationForPolities(anchor.polityIds, anchor.year) : null;
+  }, [state.letterOpen, state.letterId]);
+
+  const handleDescend = useCallback((eventId: string) => {
+    const target = events.find((event) => event.id === eventId);
+    if (!target) return;
+    const targetChapter = chapters.find((c) => c.id === target.chapterId);
+    if (!targetChapter) return;
+    const candidates = chapterSlices(targetChapter.id);
+    const targetSlice = candidates.filter((candidate) => candidate.year <= target.year).at(-1) ?? candidates[0];
+    if (!targetSlice) return;
+    dispatch({ type: 'SELECT_CHAPTER', chapterId: targetChapter.id });
+    dispatch({ type: 'SELECT_SLICE', sliceId: targetSlice.id });
+    dispatch({ type: 'FOCUS_LETTER_EVENT', eventId: null });
+  }, []);
+
   return (
     <main className="app-shell">
       <TopBar
@@ -209,6 +243,7 @@ export default function App() {
             links={links}
             flows={flows}
             resetKey={chapter.id}
+            focusLon={focusLon}
             onSelectPolity={(polityId) => dispatch({ type: 'SELECT_POLITY', polityId })}
           />
         ) : (
@@ -326,6 +361,7 @@ export default function App() {
             focusedEventId={state.letterFocusedEventId}
             onPickIntent={handlePickIntent}
             onFocusEvent={handleFocusLetterEvent}
+            onDescend={handleDescend}
             onClose={() => dispatch({ type: 'CLOSE_LETTERS' })}
           />
         )}
